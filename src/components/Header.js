@@ -9,7 +9,7 @@ function Header({ titulo, pesquisaOff }) {
   return (
     <main>
       <h1 data-testid="page-title">{ titulo }</h1>
-      <button type="button" onClick={ history.push('/profile') }>
+      <button type="button" onClick={ () => { history.push('/profile'); } }>
         <img data-testid="profile-top-btn" src={ profileIcon } alt="Icone Perfil" />
       </button>
       { !pesquisaOff && (<img
