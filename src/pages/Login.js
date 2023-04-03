@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
-function Login() {
+function Login({ history }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [btnDesabilitado, setBtnDesabilitado] = useState(true);
@@ -18,6 +19,11 @@ function Login() {
     };
     habilitaBotao();
   }, [email, senha]);
+
+  const salvarDados = () => {
+    localStorage.setItem('user', JSON.stringify({ email }));
+    history.push('/meals');
+  };
 
   return (
     <form>
@@ -40,6 +46,7 @@ function Login() {
         type="submit"
         data-testid="login-submit-btn"
         disabled={ btnDesabilitado }
+        onClick={ salvarDados }
       >
         Login
 
@@ -47,5 +54,9 @@ function Login() {
     </form>
   );
 }
+
+Login.propTypes = {
+  history: PropTypes.object,
+}.isRequired;
 
 export default Login;
