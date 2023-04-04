@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import AppContext from './AppContext';
 
 function AppProvider({ children }) {
-  const [respotaDaPesquisa, setRespostaDaPesquisa] = useState;
+  const [respotaDaPesquisa, setRespostaDaPesquisa] = useState();
 
   const values = useMemo(() => ({
     respotaDaPesquisa,

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import AppProvider from '../context/AppProvider';
+import AppContext from '../context/AppContext';
 
 function SearchBar() {
-  const { setRespostaDaPesquisa } = useContext(AppProvider);
+  const { setRespostaDaPesquisa } = useContext(AppContext);
   const [tipoDePesquisa, setTipoDePesquisa] = useState('ingrediente');
   const [refeicaoPesquisada, setRefeicaoPesquisada] = useState('');
   const [comidaDados, setComidaDados] = useState();
