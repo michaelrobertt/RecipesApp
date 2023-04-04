@@ -24,6 +24,8 @@ function SearchBar() {
         }
         setRespostaDaPesquisa(comidaDados);
       }
+    } else {
+      global.alert('Sorry, we haven\'t found any recipes for these filters.');
     }
   }, [comidaDados]);
 
