@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Header from '../components/Header';
 import AppContext from '../context/AppContext';
+import Footer from '../components/Footer';
 
 function Meals() {
   const { respostaDaPesquisa } = useContext(AppContext);
@@ -21,7 +22,7 @@ function Meals() {
 
   return (
     <div>
-      <Header titulo="Drinks" />
+      <Header titulo="Meals" />
       {carregando ? (<p>carregando...</p>) : (
         renderizaReceita.map((receita, index) => (
           <div
@@ -30,7 +31,7 @@ function Meals() {
           >
             <img
               src={ receita.strMealThumb }
-              alt="Foto da bebida"
+              alt="Foto da comida"
               data-testid={ `${index}-card-img` }
             />
             <p data-testid={ `${index}-card-name` }>{receita.strMeal}</p>
@@ -38,6 +39,7 @@ function Meals() {
           </div>
         ))
       )}
+      <Footer />
     </div>
   );
 }

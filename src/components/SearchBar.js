@@ -6,7 +6,7 @@ function SearchBar() {
   const { setRespostaDaPesquisa } = useContext(AppContext);
   const [tipoDePesquisa, setTipoDePesquisa] = useState('ingrediente');
   const [refeicaoPesquisada, setRefeicaoPesquisada] = useState('');
-  const [comidaDados, setComidaDados] = useState();
+  const [comidaDados, setComidaDados] = useState(null);
   const location = useLocation();
   const history = useHistory();
 
@@ -25,9 +25,22 @@ function SearchBar() {
         setRespostaDaPesquisa(comidaDados);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comidaDados]);
 
+  const verificaFiltros = () => {
+    console.log(comidaDados);
+    if (comidaDados === null) {
+      global.alert('Sorry, we haven\'t found any recipes for these filters.');
+    }
+  };
+
   const pesquisarComida = async () => {
+    if (tipoDePesquisa === 'primeiraLetra' && refeicaoPesquisada.length > 1) {
+      global.alert('Your search must have only 1 (one) character');
+      return;
+    }
+
     if (tipoDePesquisa === 'ingrediente') {
       const requisicao = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${refeicaoPesquisada}`);
       const dados = await requisicao.json();
@@ -36,8 +49,6 @@ function SearchBar() {
       const requisicaoNome = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${refeicaoPesquisada}`);
       const dadosNome = await requisicaoNome.json();
       return setComidaDados(dadosNome.meals);
-    } if (tipoDePesquisa === 'primeiraLetra' && tipoDePesquisa.length > 1) {
-      global.alert('Your search must have only 1 (one) character');
     }
     const requisicaoLetra = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?f=${refeicaoPesquisada}`);
     const dadosLetra = await requisicaoLetra.json();
@@ -45,6 +56,10 @@ function SearchBar() {
   };
 
   const pesquisarBebida = async () => {
+    if (tipoDePesquisa === 'primeiraLetra' && refeicaoPesquisada.length > 1) {
+      global.alert('Your search must have only 1 (one) character');
+      return;
+    }
     if (tipoDePesquisa === 'ingrediente') {
       const requisicao = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${refeicaoPesquisada}`);
       const dados = await requisicao.json();
@@ -53,8 +68,6 @@ function SearchBar() {
       const requisicaoNome = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${refeicaoPesquisada}`);
       const dadosNome = await requisicaoNome.json();
       return setComidaDados(dadosNome.drinks);
-    } if (tipoDePesquisa === 'primeiraLetra' && tipoDePesquisa.length > 1) {
-      global.alert('Your search must have only 1 (one) character');
     }
     const requisicaoLetra = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?f=${refeicaoPesquisada}`);
     const dadosLetra = await requisicaoLetra.json();
@@ -64,12 +77,14 @@ function SearchBar() {
   const pesquisar = async () => {
     if (location.pathname === '/meals') {
       pesquisarComida();
+      verificaFiltros();
     }
     if (location.pathname === '/drinks') {
       pesquisarBebida();
+      verificaFiltros();
     }
   };
-  console.log(comidaDados);
+
   return (
     <>
       <div>SearchBar</div>
