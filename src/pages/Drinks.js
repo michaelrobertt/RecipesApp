@@ -9,15 +9,14 @@ function Drinks() {
   const [renderizaReceita, setRederizaReceita] = useState();
   const [carregando, setCarregando] = useState(true);
 
+  const requisicaoPadrao = async () => {
+    const requisicao = await fetch('https://www.thecocktaildb.com/api/json/v1/1/search.php?s=');
+    const dados = await requisicao.json();
+    setRespostaDaPesquisa(dados.drinks);
+  };
+
   useEffect(() => {
-    const requisicaoPadrao = async () => {
-      const requisicao = await fetch('https://www.thecocktaildb.com/api/json/v1/1/search.php?s=');
-      const dados = await requisicao.json();
-      setRespostaDaPesquisa(dados.drinks);
-    };
-
     requisicaoPadrao();
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -41,6 +40,12 @@ function Drinks() {
     }
   }, [respostaDaPesquisa]);
 
+  const fetchByCategory = async (category) => {
+    const request = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?c=${category}`);
+    const data = await request.json();
+    setRespostaDaPesquisa(data.drinks);
+  };
+
   return (
     <div>
       <Header titulo="Drinks" />
@@ -59,6 +64,7 @@ function Drinks() {
             className="drinks-btnCategory"
             id={ ele.strCategory }
             data-testid={ `${ele.strCategory}-category-filter` }
+            onClick={ () => fetchByCategory(ele.strCategory) }
           >
             { ele.strCategory }
           </button>
