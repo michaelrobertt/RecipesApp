@@ -49,7 +49,7 @@ function Drinks() {
           <div key={ receita.idDrink }>
             <button
               type="button"
-              className="meals-btnCategory"
+              className="drinks-btnCategory"
               onClick={ () => { requisicaoPadrao(); } }
               data-testid="All-category-filter"
             >
@@ -59,7 +59,7 @@ function Drinks() {
               <div key={ index2 }>
                 <button
                   type="button"
-                  className="meals-btnCategory"
+                  className="drinks-btnCategory"
                   id={ ele.strCategory }
                   data-testid={ `${ele.strCategory}-category-filter` }
                 >
