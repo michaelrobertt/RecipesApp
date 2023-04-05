@@ -44,29 +44,29 @@ function Drinks() {
   return (
     <div>
       <Header titulo="Drinks" />
+      <button
+        type="button"
+        className="drinks-btnCategory"
+        onClick={ () => { requisicaoPadrao(); } }
+        data-testid="All-category-filter"
+      >
+        All
+      </button>
+      { categoriaBebida && categoriaBebida.map((ele, index2) => (
+        <div key={ index2 }>
+          <button
+            type="button"
+            className="drinks-btnCategory"
+            id={ ele.strCategory }
+            data-testid={ `${ele.strCategory}-category-filter` }
+          >
+            { ele.strCategory }
+          </button>
+        </div>
+      ))}
       {carregando ? (<p>Carregando...</p>) : (
         renderizaReceita.map((receita, index) => (
           <div key={ receita.idDrink }>
-            <button
-              type="button"
-              className="drinks-btnCategory"
-              onClick={ () => { requisicaoPadrao(); } }
-              data-testid="All-category-filter"
-            >
-              All
-            </button>
-            {categoriaBebida.map((ele, index2) => (
-              <div key={ index2 }>
-                <button
-                  type="button"
-                  className="drinks-btnCategory"
-                  id={ ele.strCategory }
-                  data-testid={ `${ele.strCategory}-category-filter` }
-                >
-                  { ele.strCategory }
-                </button>
-              </div>
-            ))}
             <div
               data-testid={ `${index}-recipe-card` }
             >
