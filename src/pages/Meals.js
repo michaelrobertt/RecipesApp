@@ -74,7 +74,6 @@ function Meals() {
                 data-testid={ `${index}-card-img` }
               />
               <p data-testid={ `${index}-card-name` }>{receita.strMeal}</p>
-
             </div>
           </div>
         ))
