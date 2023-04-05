@@ -13,7 +13,6 @@ function Meals() {
     const requisicaoPadrao = async () => {
       const requisicao = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=');
       const dados = await requisicao.json();
-      console.log(dados);
       setRespostaDaPesquisa(dados.meals);
     };
     requisicaoPadrao();
@@ -39,8 +38,6 @@ function Meals() {
       requisicaoCategoria();
     }
   }, [respostaDaPesquisa]);
-
-  console.log(renderizaReceita);
 
   return (
     <div>
