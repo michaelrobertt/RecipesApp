@@ -4,9 +4,19 @@ import AppContext from '../context/AppContext';
 import Footer from '../components/Footer';
 
 function Meals() {
-  const { respostaDaPesquisa } = useContext(AppContext);
+  const { respostaDaPesquisa, setRespostaDaPesquisa } = useContext(AppContext);
   const [renderizaReceita, setRederizaReceita] = useState();
   const [carregando, setCarregando] = useState(true);
+
+  useEffect(() => {
+    const requisicaoPadrao = async () => {
+      const requisicao = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=');
+      const dados = await requisicao.json();
+      return setRespostaDaPesquisa(dados.meals);
+    };
+    requisicaoPadrao();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (respostaDaPesquisa) {
