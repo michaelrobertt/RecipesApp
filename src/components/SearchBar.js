@@ -6,7 +6,7 @@ function SearchBar() {
   const { setRespostaDaPesquisa } = useContext(AppContext);
   const [tipoDePesquisa, setTipoDePesquisa] = useState('ingrediente');
   const [refeicaoPesquisada, setRefeicaoPesquisada] = useState('');
-  const [comidaDados, setComidaDados] = useState();
+  const [comidaDados, setComidaDados] = useState(null);
   const location = useLocation();
   const history = useHistory();
 
@@ -24,10 +24,15 @@ function SearchBar() {
         }
         setRespostaDaPesquisa(comidaDados);
       }
-    } else {
-      global.alert('Sorry, we haven\'t found any recipes for these filters.');
     }
   }, [comidaDados]);
+
+  const verificaFiltros = () => {
+    console.log(comidaDados);
+    if (comidaDados === null) {
+      global.alert('Sorry, we haven\'t found any recipes for these filters.');
+    }
+  };
 
   const pesquisarComida = async () => {
     if (tipoDePesquisa === 'ingrediente') {
@@ -66,12 +71,14 @@ function SearchBar() {
   const pesquisar = async () => {
     if (location.pathname === '/meals') {
       pesquisarComida();
+      verificaFiltros();
     }
     if (location.pathname === '/drinks') {
       pesquisarBebida();
+      verificaFiltros();
     }
   };
-  console.log(comidaDados);
+
   return (
     <>
       <div>SearchBar</div>
