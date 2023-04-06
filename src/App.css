@@ -29,6 +29,12 @@
 }
 */
 
+.footer {
+  bottom: 0;
+  position: fixed;
+  width: 100%;
+}
+
 .meals > .logo {
   animation: shake 1.5s infinite ease;
   color: aliceblue;

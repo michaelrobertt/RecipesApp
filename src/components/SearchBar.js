@@ -26,6 +26,7 @@ function SearchBar() {
         setRespostaDaPesquisa(comidaDados);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comidaDados]);
 
   const pesquisarComida = async () => {
