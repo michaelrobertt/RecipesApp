@@ -7,6 +7,7 @@ import blackHeartIcon from '../images/blackHeartIcon.svg';
 function FavoriteRecipes() {
   const [receitasSalvas, setReceitasSalvas] = useState([]);
   const [carregando, setCarregando] = useState(true);
+  const [linkCopiado, setLinkCopiado] = useState(false);
 
   useEffect(() => {
     const receitasDoUsuario = localStorage.getItem('favoriteRecipes');
@@ -14,6 +15,15 @@ function FavoriteRecipes() {
     setReceitasSalvas(receitasDoUsuarioObjeto);
     setCarregando(false);
   }, []);
+
+  const funcaoBotaoCompartilhar = (tipoReceita, idReceita) => {
+    const tempoDeMsg = 3000;
+    navigator.clipboard.writeText(`http://localhost:3000/${tipoReceita}s/${idReceita}`);
+    setLinkCopiado(true);
+    setTimeout(() => {
+      setLinkCopiado(false);
+    }, tempoDeMsg);
+  };
 
   return (
     <div>
@@ -44,6 +54,7 @@ function FavoriteRecipes() {
               <button
                 src={ shareIcon }
                 data-testid={ `${index}-horizontal-share-btn` }
+                onClick={ () => funcaoBotaoCompartilhar(receita.type, receita.id) }
               >
                 <img src={ shareIcon } alt="Botão Compartilhar" />
               </button>
@@ -53,6 +64,7 @@ function FavoriteRecipes() {
               >
                 <img src={ blackHeartIcon } alt="Botão Favoritar" />
               </button>
+              {linkCopiado ? (<p>Link copied!</p>) : ''}
             </div>
           );
         }
@@ -82,6 +94,7 @@ function FavoriteRecipes() {
             >
               <img src={ blackHeartIcon } alt="Botão Favoritar" />
             </button>
+            {linkCopiado ? (<p>Link copied!</p>) : ''}
           </div>
         );
       })}
