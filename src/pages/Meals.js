@@ -8,6 +8,7 @@ function Meals() {
   const { respostaDaPesquisa, setRespostaDaPesquisa } = useContext(AppContext);
   const [renderizaReceita, setRederizaReceita] = useState();
   const [categoriaComida, setCategoriaComida] = useState();
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState();
   const [carregando, setCarregando] = useState(true);
 
   const requisicaoPadrao = async () => {
@@ -45,6 +46,10 @@ function Meals() {
     const request = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`);
     const data = await request.json();
     setRespostaDaPesquisa(data.meals);
+    setCategoriaSelecionada(true);
+    if (categoriaSelecionada) {
+      requisicaoPadrao();
+    }
   };
 
   return (
