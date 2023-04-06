@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import AppContext from '../context/AppContext';
 import Footer from '../components/Footer';
@@ -70,20 +71,22 @@ function Drinks() {
           </button>
         </div>
       ))}
-      {carregando ? (<p>Carregando...</p>) : (
+      {carregando ? (<p>carregando...</p>) : (
         renderizaReceita.map((receita, index) => (
           <div key={ receita.idDrink }>
-            <div
+            <Link
+              to={ `/drinks/${receita.idDrink}` }
               data-testid={ `${index}-recipe-card` }
             >
-              <img
-                src={ receita.strDrinkThumb }
-                alt="Foto da bebida"
-                data-testid={ `${index}-card-img` }
-              />
-              <p data-testid={ `${index}-card-name` }>{receita.strDrink}</p>
-
-            </div>
+              <div>
+                <img
+                  src={ receita.strDrinkThumb }
+                  alt="Foto da comida"
+                  data-testid={ `${index}-card-img` }
+                />
+                <p data-testid={ `${index}-card-name` }>{receita.strDrink}</p>
+              </div>
+            </Link>
           </div>
         ))
       )}
