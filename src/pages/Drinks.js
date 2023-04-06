@@ -7,6 +7,7 @@ function Drinks() {
   const { respostaDaPesquisa, setRespostaDaPesquisa } = useContext(AppContext);
   const [categoriaBebida, setCategoriaBebida] = useState();
   const [renderizaReceita, setRederizaReceita] = useState();
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState();
   const [carregando, setCarregando] = useState(true);
 
   const requisicaoPadrao = async () => {
@@ -44,6 +45,10 @@ function Drinks() {
     const request = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?c=${category}`);
     const data = await request.json();
     setRespostaDaPesquisa(data.drinks);
+    setCategoriaSelecionada(true);
+    if (categoriaSelecionada) {
+      requisicaoPadrao();
+    }
   };
 
   return (
