@@ -42,7 +42,7 @@ function Drinks() {
     }
   }, [respostaDaPesquisa]);
 
-  const fetchByCategory = async (category) => {
+  const requisicaoPorCategoria = async (category) => {
     const request = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?c=${category}`);
     const data = await request.json();
     setRespostaDaPesquisa(data.drinks);
@@ -70,7 +70,7 @@ function Drinks() {
             className="drinks-btnCategory"
             id={ ele.strCategory }
             data-testid={ `${ele.strCategory}-category-filter` }
-            onClick={ () => fetchByCategory(ele.strCategory) }
+            onClick={ () => requisicaoPorCategoria(ele.strCategory) }
           >
             { ele.strCategory }
           </button>
