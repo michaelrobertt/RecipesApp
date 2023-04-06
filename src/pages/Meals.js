@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import AppContext from '../context/AppContext';
 import Footer from '../components/Footer';
@@ -41,7 +42,7 @@ function Meals() {
     }
   }, [respostaDaPesquisa]);
 
-  const fetchByCategory = async (category) => {
+  const requisicaoPorCategoria = async (category) => {
     const request = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`);
     const data = await request.json();
     setRespostaDaPesquisa(data.meals);
@@ -69,7 +70,7 @@ function Meals() {
             className="meals-btnCategory"
             id={ ele.strCategory }
             data-testid={ `${ele.strCategory}-category-filter` }
-            onClick={ () => fetchByCategory(ele.strCategory) }
+            onClick={ () => requisicaoPorCategoria(ele.strCategory) }
           >
             { ele.strCategory }
           </button>
@@ -78,16 +79,19 @@ function Meals() {
       {carregando ? (<p>carregando...</p>) : (
         renderizaReceita.map((receita, index) => (
           <div key={ receita.idMeals }>
-            <div
+            <Link
+              to={ `/meals/${receita.idMeal}` }
               data-testid={ `${index}-recipe-card` }
             >
-              <img
-                src={ receita.strMealThumb }
-                alt="Foto da comida"
-                data-testid={ `${index}-card-img` }
-              />
-              <p data-testid={ `${index}-card-name` }>{receita.strMeal}</p>
-            </div>
+              <div>
+                <img
+                  src={ receita.strMealThumb }
+                  alt="Foto da comida"
+                  data-testid={ `${index}-card-img` }
+                />
+                <p data-testid={ `${index}-card-name` }>{receita.strMeal}</p>
+              </div>
+            </Link>
           </div>
         ))
       )}
