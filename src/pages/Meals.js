@@ -18,14 +18,13 @@ function Meals() {
       dozeReceitas();
     }
   }, [respostaDaPesquisa]);
-
   return (
     <div>
       <Header titulo="Meals" />
       {carregando ? (<p>carregando...</p>) : (
         renderizaReceita.map((receita, index) => (
           <div
-            key={ receita.idMeals }
+            key={ index }
             data-testid={ `${index}-recipe-card` }
           >
             <img

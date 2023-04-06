@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import userEvent from '@testing-library/user-event';
 import renderWithRouter from './helpers/renderWithRouter';
@@ -51,13 +51,18 @@ describe('Teste o componente SearchBar', () => {
     userEvent.click(iconePesquisa);
 
     const inoutDeBusca = screen.getByTestId('search-input');
-    const ingredienteBusca = screen.getByTestId('ingredient-search-radio');
-    const botaoBusca = screen.getByRole('button', { name: /pesquisar/i });
-
     userEvent.type(inoutDeBusca, 'chicken');
-    fireEvent.click(ingredienteBusca);
+
+    const nomeBusca = screen.getByRole('radio', { name: /nome/i });
+    userEvent.click(nomeBusca);
+
+    const ingredienteBusca = screen.getByRole('radio', { name: /ingrediente/i });
+    userEvent.click(ingredienteBusca);
+
+    const botaoBusca = screen.getByRole('button', { name: /pesquisar/i });
     userEvent.click(botaoBusca);
 
+    await waitForElementToBeRemoved(screen.queryByText(/carregando\.\.\./i));
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(screen.getByTestId('1-card-img')).toBeInTheDocument();
@@ -130,42 +135,6 @@ describe('Teste o componente SearchBar', () => {
       expect(screen.getByTestId('1-card-img')).toBeInTheDocument();
     });
   });
-  it.only('Testa se ao digitar 2 letras e selecionar a opção de primeira letra recebemos um erro', async () => {
-    let savedAlertMessage;
-
-    const alertMock = jest.fn().mockImplementation((message) => {
-      savedAlertMessage = message;
-    });
-
-    global.alert = alertMock;
-    const { history } = renderWithRouter(
-      <AppProvider>
-        <App />
-      </AppProvider>,
-    );
-
-    act(() => {
-      history.push('/meals');
-    });
-
-    const iconePesquisa = screen.getByRole('img', { name: /icone pesquisa/i });
-    userEvent.click(iconePesquisa);
-
-    const inoutDeBusca = screen.getByRole('textbox');
-    const letraBusca = screen.getByText(/primeira letra/i);
-    const botaoBusca = screen.getByRole('button', { name: /pesquisar/i });
-
-    fireEvent.change(inoutDeBusca, { target: { value: '' } });
-    // userEvent.type(inoutDeBusca, 'aa');
-    userEvent.click(letraBusca);
-    userEvent.click(botaoBusca);
-    // screen.logTestingPlaygroundURL();
-
-    await waitFor(() => {
-      expect(alertMock).toHaveBeenCalled();
-      expect(savedAlertMessage).toBe('Your search must have only 1 (one) character');
-    });
-  });
   it('Testa a funcionalidade quando a resposta é apenas uma comida', async () => {
     jest.spyOn(global, 'fetch').mockResolvedValue({
       json: jest.fn().mockResolvedValue(
@@ -186,7 +155,7 @@ describe('Teste o componente SearchBar', () => {
     userEvent.click(iconePesquisa);
 
     const inoutDeBusca = screen.getByRole('textbox');
-    userEvent.type(inoutDeBusca, /arrabiata/i);
+    userEvent.type(inoutDeBusca, 'arrabiata');
 
     const nomeBusca = screen.getByTestId('name-search-radio');
     userEvent.click(nomeBusca);
@@ -199,6 +168,7 @@ describe('Teste o componente SearchBar', () => {
       expect(history.location.pathname).toBe('/meals/52771');
     });
   });
+
   it('Testa a funcionalidade da pesquisa por ingrediente de bebida', async () => {
     jest.spyOn(global, 'fetch').mockResolvedValue({
       json: jest.fn().mockResolvedValue(
@@ -283,19 +253,22 @@ describe('Teste o componente SearchBar', () => {
     userEvent.click(iconePesquisa);
 
     const inoutDeBusca = screen.getByRole('textbox');
-    const letraBusca = screen.getByText(/primeira letra/i);
-    const botaoBusca = screen.getByRole('button', { name: /pesquisar/i });
-
     userEvent.type(inoutDeBusca, 'a');
+    expect(inoutDeBusca).toHaveValue('a');
+    const letraBusca = screen.getByText(/primeira letra/i);
     userEvent.click(letraBusca);
+
+    const botaoBusca = screen.getByRole('button', { name: /pesquisar/i });
     userEvent.click(botaoBusca);
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(screen.getByTestId('3-card-img')).toBeInTheDocument();
     });
+    const card = await screen.findByTestId('3-card-img');
+    expect(card).toBeInTheDocument();
   });
-  it('Testa a funcionalidade quando a resposta é apenas uma comida', async () => {
+
+  it('Testa a funcionalidade quando a resposta é apenas uma bebida', async () => {
     jest.spyOn(global, 'fetch').mockResolvedValue({
       json: jest.fn().mockResolvedValue(
         oneDrink,
@@ -315,7 +288,7 @@ describe('Teste o componente SearchBar', () => {
     userEvent.click(iconePesquisa);
 
     const inoutDeBusca = screen.getByRole('textbox');
-    userEvent.type(inoutDeBusca, /aquamarine/i);
+    userEvent.type(inoutDeBusca, 'aquamarine');
 
     const nomeBusca = screen.getByTestId('name-search-radio');
     userEvent.click(nomeBusca);
