@@ -8,7 +8,7 @@ function Profile() {
   const history = useHistory();
 
   const funcaoLogout = () => {
-    localStorage.removeItem('user');
+    localStorage.clear();
     history.push('/');
   };
 
