@@ -9,12 +9,13 @@ function Meals() {
   const [categoriaComida, setCategoriaComida] = useState();
   const [carregando, setCarregando] = useState(true);
 
+  const requisicaoPadrao = async () => {
+    const requisicao = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=');
+    const dados = await requisicao.json();
+    setRespostaDaPesquisa(dados.meals);
+  };
+
   useEffect(() => {
-    const requisicaoPadrao = async () => {
-      const requisicao = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=');
-      const dados = await requisicao.json();
-      setRespostaDaPesquisa(dados.meals);
-    };
     requisicaoPadrao();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -39,6 +40,12 @@ function Meals() {
     }
   }, [respostaDaPesquisa]);
 
+  const fetchByCategory = async (category) => {
+    const request = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`);
+    const data = await request.json();
+    setRespostaDaPesquisa(data.meals);
+  };
+
   return (
     <div>
       <Header titulo="Meals" />
@@ -57,6 +64,7 @@ function Meals() {
             className="meals-btnCategory"
             id={ ele.strCategory }
             data-testid={ `${ele.strCategory}-category-filter` }
+            onClick={ () => fetchByCategory(ele.strCategory) }
           >
             { ele.strCategory }
           </button>
