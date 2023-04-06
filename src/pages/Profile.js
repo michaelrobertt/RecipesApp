@@ -15,7 +15,7 @@ function Profile() {
   useEffect(() => {
     const userSalvo = localStorage.getItem('user');
     const emailObject = JSON.parse(userSalvo);
-    const emailSalvo = emailObject.email;
+    const emailSalvo = emailObject?.email ?? '';
     setEmail(emailSalvo);
   }, []);
 
