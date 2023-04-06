@@ -9,6 +9,7 @@ function SearchBar() {
   const [comidaDados, setComidaDados] = useState(null);
   const location = useLocation();
   const history = useHistory();
+  const alerta = 'Sorry, we haven\'t found any recipes for these filters.';
 
   useEffect(() => {
     if (comidaDados) {
@@ -28,60 +29,66 @@ function SearchBar() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comidaDados]);
 
-  const verificaFiltros = () => {
-    console.log(comidaDados);
-    if (comidaDados === null) {
-      global.alert('Sorry, we haven\'t found any recipes for these filters.');
-    }
-  };
-
   const pesquisarComida = async () => {
     if (tipoDePesquisa === 'primeiraLetra' && refeicaoPesquisada.length > 1) {
       global.alert('Your search must have only 1 (one) character');
-      return;
-    }
-
-    if (tipoDePesquisa === 'ingrediente') {
+    } if (tipoDePesquisa === 'ingrediente') {
       const requisicao = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${refeicaoPesquisada}`);
       const dados = await requisicao.json();
+      if (dados.meals === null || refeicaoPesquisada === '') {
+        global.alert(alerta);
+      }
       return setComidaDados(dados.meals);
     } if (tipoDePesquisa === 'nome') {
       const requisicaoNome = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${refeicaoPesquisada}`);
       const dadosNome = await requisicaoNome.json();
+      if (dadosNome.meals === null || refeicaoPesquisada === '') {
+        global.alert(alerta);
+      }
       return setComidaDados(dadosNome.meals);
+    } if (tipoDePesquisa === 'primeiraLetra') {
+      const requisicaoLetra = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?f=${refeicaoPesquisada}`);
+      const dadosLetra = await requisicaoLetra.json();
+      if (dadosLetra.meals === null || refeicaoPesquisada === '') {
+        global.alert(alerta);
+      }
+      return setComidaDados(dadosLetra.meals);
     }
-    const requisicaoLetra = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?f=${refeicaoPesquisada}`);
-    const dadosLetra = await requisicaoLetra.json();
-    return setComidaDados(dadosLetra.meals);
   };
 
   const pesquisarBebida = async () => {
     if (tipoDePesquisa === 'primeiraLetra' && refeicaoPesquisada.length > 1) {
       global.alert('Your search must have only 1 (one) character');
-      return;
-    }
-    if (tipoDePesquisa === 'ingrediente') {
-      const requisicao = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${refeicaoPesquisada}`);
-      const dados = await requisicao.json();
-      return setComidaDados(dados.drinks);
+    } if (tipoDePesquisa === 'ingrediente') {
+      if (refeicaoPesquisada !== '') {
+        const requisicao = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${refeicaoPesquisada}`);
+        const dados = await requisicao.json();
+        return setComidaDados(dados.drinks);
+      }
+      global.alert(alerta);
     } if (tipoDePesquisa === 'nome') {
       const requisicaoNome = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${refeicaoPesquisada}`);
       const dadosNome = await requisicaoNome.json();
+      if (dadosNome.drinks === null || refeicaoPesquisada === '') {
+        global.alert(alerta);
+      }
       return setComidaDados(dadosNome.drinks);
+    } if (tipoDePesquisa === 'primeiraLetra') {
+      const requisicaoLetra = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?f=${refeicaoPesquisada}`);
+      const dadosLetra = await requisicaoLetra.json();
+      if (dadosLetra.drinks === null || refeicaoPesquisada === '') {
+        global.alert(alerta);
+      }
+      return setComidaDados(dadosLetra.drinks);
     }
-    const requisicaoLetra = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?f=${refeicaoPesquisada}`);
-    const dadosLetra = await requisicaoLetra.json();
-    return setComidaDados(dadosLetra.drinks);
   };
 
-  const pesquisar = async () => {
+  const pesquisar = () => {
     if (location.pathname === '/meals') {
       pesquisarComida();
-      verificaFiltros();
     }
     if (location.pathname === '/drinks') {
       pesquisarBebida();
-      verificaFiltros();
     }
   };
 
@@ -92,6 +99,7 @@ function SearchBar() {
         type="text"
         data-testid="search-input"
         name="barraDePesquisa"
+        value={ refeicaoPesquisada }
         onChange={ (e) => setRefeicaoPesquisada(e.target.value) }
       />
       <label htmlFor="ingrediente">
@@ -122,7 +130,7 @@ function SearchBar() {
         <input
           type="radio"
           data-testid="first-letter-search-radio"
-          id="PrimeiraLetra"
+          id="primeiraLetra"
           name="primeiraLetra"
           value="primeiraLetra"
           checked={ tipoDePesquisa === 'primeiraLetra' }

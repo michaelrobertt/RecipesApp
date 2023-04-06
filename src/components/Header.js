@@ -5,7 +5,7 @@ import profileIcon from '../images/profileIcon.svg';
 import searchIcon from '../images/searchIcon.svg';
 import SearchBar from './SearchBar';
 
-function Header({ titulo, pesquisaOff }) {
+function Header({ titulo, pesquisaOff = false }) {
   const history = useHistory();
   const [mostrarBarraPesquisa, setMostrarBarraPesquisa] = useState(false);
   return (
@@ -35,7 +35,7 @@ function Header({ titulo, pesquisaOff }) {
 
 Header.propTypes = {
   titulo: PropTypes.string.isRequired,
-  pesquisaOff: PropTypes.bool.isRequired,
+  pesquisaOff: PropTypes.bool,
 };
 
 export default Header;
