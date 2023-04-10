@@ -30,9 +30,9 @@
 */
 
 .footer {
-  position: fixed;
   bottom: 0;
   left: 50%;
+  position: fixed;
   transform: translateX(-50%);
 }
 
@@ -43,6 +43,11 @@
   font-family: Montserrat , sans-serif;
   font-size: 3em;
   font-weight: 900;
+}
+
+.imgComida {
+  height: 30%;
+  width: 30%;
 }
 
 @keyframes shake {
