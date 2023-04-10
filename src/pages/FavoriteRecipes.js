@@ -14,7 +14,7 @@ function FavoriteRecipes() {
     const receitasDoUsuarioObjeto = JSON.parse(receitasDoUsuario);
     setReceitasSalvas(receitasDoUsuarioObjeto);
     setCarregando(false);
-  }, []);
+  }, [], [receitasSalvas]);
 
   const funcaoBotaoCompartilhar = (tipoReceita, idReceita) => {
     const tempoDeMsg = 3000;
@@ -23,6 +23,14 @@ function FavoriteRecipes() {
     setTimeout(() => {
       setLinkCopiado(false);
     }, tempoDeMsg);
+  };
+
+  const funcaoBotaoDesfavoritar = (idReceita) => {
+    const receitasFiltradas = receitasSalvas.filter(
+      (receita) => receita.id !== idReceita,
+    );
+    setReceitasSalvas(receitasFiltradas);
+    localStorage.setItem('favoriteRecipes', JSON.stringify(receitasFiltradas));
   };
 
   return (
@@ -61,14 +69,14 @@ function FavoriteRecipes() {
               <button
                 src={ blackHeartIcon }
                 data-testid={ `${index}-horizontal-favorite-btn` }
+                onClick={ () => funcaoBotaoDesfavoritar(receita.id) }
               >
-                <img src={ blackHeartIcon } alt="Botão Favoritar" />
+                <img src={ blackHeartIcon } alt="Botão Desfavoritar" />
               </button>
               {linkCopiado ? (<p>Link copied!</p>) : ''}
             </div>
           );
         }
-
         return (
           <div key={ index }>
             <img
@@ -85,14 +93,16 @@ function FavoriteRecipes() {
             <button
               src={ shareIcon }
               data-testid={ `${index}-horizontal-share-btn` }
+              onClick={ () => funcaoBotaoCompartilhar(receita.type, receita.id) }
             >
               <img src={ shareIcon } alt="Botão Compartilhar" />
             </button>
             <button
               src={ blackHeartIcon }
               data-testid={ `${index}-horizontal-favorite-btn` }
+              onClick={ () => funcaoBotaoDesfavoritar(receita.id) }
             >
-              <img src={ blackHeartIcon } alt="Botão Favoritar" />
+              <img src={ blackHeartIcon } alt="Botão Desfavoritar" />
             </button>
             {linkCopiado ? (<p>Link copied!</p>) : ''}
           </div>
@@ -100,7 +110,6 @@ function FavoriteRecipes() {
       })}
         </div>
       )}
-
       <Footer />
     </div>
   );
