@@ -41,7 +41,6 @@ function RecommendationCard() {
                     data-testid={ `${i}-recommendation-card` }
                     key={ element.idDrink }
                     to={ `/drinks/${element.idDrink}` }
-                    // onClick={ () => window.location.replace(`/drinks/${element.idDrink}`) }
                   >
                     <img src={ element.strDrinkThumb } alt={ element.strCategory } />
                     <p data-testid={ `${i}-recommendation-title` }>{element.strDrink}</p>
@@ -55,7 +54,6 @@ function RecommendationCard() {
                     data-testid={ `${i}-recommendation-card` }
                     key={ element.idMeal }
                     to={ `/meals/${element.idMeal}` }
-                    // onClick={ () => window.location.replace(`/meals/${element.idMeal}`) }
                   >
                     <img src={ element.strMealThumb } alt={ element.strCategory } />
                     <p data-testid={ `${i}-recommendation-title` }>{element.strMeal}</p>
@@ -64,7 +62,6 @@ function RecommendationCard() {
               </section>)}
           </div>
         </div>) : null}
-
     </>
   );
 }
