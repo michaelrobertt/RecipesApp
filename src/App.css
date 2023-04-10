@@ -79,3 +79,7 @@
     transform: rotate(-10deg);
   }
 }
+
+.strike {
+  text-decoration: line-through solid black;
+}
