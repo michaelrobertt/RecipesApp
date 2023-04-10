@@ -9,7 +9,9 @@ function RecipeInProgress({ match: { params: { id } }, location: { pathname } })
   const [ingredientes, setingredientes] = useState(null);
   const [tipo, setTipo] = useState(null);
   const [carregando, setCarregando] = useState(true);
-  const [selectedIngredients, setSelectedIngredients] = useState([]);
+  const [selectedIngredients, setSelectedIngredients] = useState(
+    JSON.parse(localStorage.getItem('inProgressRecipes')) || [],
+  );
 
   useEffect(() => {
     const requisicaoDeReceita = async () => {
@@ -58,6 +60,10 @@ function RecipeInProgress({ match: { params: { id } }, location: { pathname } })
       setSelectedIngredients([...selectedIngredients, value]);
     }
   };
+
+  useEffect(() => {
+    localStorage.setItem('inProgressRecipes', JSON.stringify(selectedIngredients));
+  }, [selectedIngredients]);
 
   if (carregando) { return <h1>Carregando...</h1>; }
   return (
