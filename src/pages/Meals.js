@@ -52,7 +52,6 @@ function Meals() {
     }
   };
 
-
   return (
     <div>
       <Header titulo="Meals" />
