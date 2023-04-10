@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import RecommendationCard from '../components/RecommendationCard';
+import AppContext from '../context/AppContext';
 
 function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
-  // const { respostaDaPesquisa, setRespostaDaPesquisa } = useContext(AppContext);
+  const { setRecomendacoes } = useContext(AppContext);
   const [receita, setReceita] = useState();
-  const [setRecomendacoes] = useState();
   const [ingredientes, setingredientes] = useState(null);
   const [tipo, setTipo] = useState(null);
   const [carregando, setCarregando] = useState(true);
@@ -105,6 +106,7 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
           <p data-testid="instructions">{receita[tipo][0].strInstructions}</p>
         </section>
       )}
+      <RecommendationCard />
     </div>
   );
 }
