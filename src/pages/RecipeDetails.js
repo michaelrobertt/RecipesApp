@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 import RecommendationCard from '../components/RecommendationCard';
 import AppContext from '../context/AppContext';
+import ShareButton from '../components/ShareButton';
+import FavoriteButton from '../components/FavoriteButton';
 
 function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
   const { setRecomendacoes } = useContext(AppContext);
@@ -87,6 +89,8 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
   if (carregando) { return <h1>Carregando...</h1>; }
   return (
     <div>
+      <ShareButton />
+      <FavoriteButton />
       {!pathname.includes('drinks') ? (
         <section>
           <img
