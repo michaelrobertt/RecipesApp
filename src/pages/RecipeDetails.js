@@ -9,6 +9,8 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
   const [ingredientes, setingredientes] = useState(null);
   const [tipo, setTipo] = useState(null);
   const [carregando, setCarregando] = useState(true);
+  const [receitaCompleta, setReceitaCompleta] = useState(false);
+  const doneRecipes = JSON.parse(localStorage.getItem('doneRecipes'));
 
   useEffect(() => {
     const requisicaoDeReceita = async () => {
@@ -46,6 +48,16 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
       });
     }
   }, [receita]);
+
+  useEffect(() => {
+    if (doneRecipes) {
+      doneRecipes.forEach((item) => {
+        if (item.id === id) {
+          setReceitaCompleta(true);
+        }
+      });
+    }
+  }, [doneRecipes]);
 
   useEffect(() => {
     if (ingredientes) {
@@ -107,17 +119,18 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
         </section>
       )}
       <RecommendationCard />
-      <button
-        type="button"
-        data-testid="start-recipe-btn"
-        onClick={ () => {} }
-        style={ {
-          position: 'fixed',
-          bottom: 0,
-        } }
-      >
-        Start Recipe
-      </button>
+      {!receitaCompleta ? (
+        <button
+          type="button"
+          data-testid="start-recipe-btn"
+          onClick={ startRecipe }
+          style={ {
+            position: 'fixed',
+            bottom: 0,
+          } }
+        >
+          Start Recipe
+        </button>) : null}
     </div>
   );
 }
