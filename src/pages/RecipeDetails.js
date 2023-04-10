@@ -107,6 +107,17 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
         </section>
       )}
       <RecommendationCard />
+      <button
+        type="button"
+        data-testid="start-recipe-btn"
+        onClick={ () => {} }
+        style={ {
+          position: 'fixed',
+          bottom: 0,
+        } }
+      >
+        Start Recipe
+      </button>
     </div>
   );
 }
