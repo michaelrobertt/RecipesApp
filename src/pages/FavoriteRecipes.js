@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import shareIcon from '../images/shareIcon.svg';
@@ -69,17 +70,20 @@ function FavoriteRecipes() {
         if (receita.type === 'meal') {
           return (
             <div key={ index }>
-              <img
-                src={ receita.image }
-                alt="Imagem da receita favoritada"
-                data-testid={ `${index}-horizontal-image` }
-              />
-              <p data-testid={ `${index}-horizontal-top-text` }>
-                {`${receita.nationality} - ${receita.category}`}
-              </p>
-              <p data-testid={ `${index}-horizontal-name` }>
-                {`${receita.name}`}
-              </p>
+              <Link to={ `/${receita.type}s/${receita.id}` }>
+                <img
+                  className="imgComida"
+                  src={ receita.image }
+                  alt="Imagem da receita favoritada"
+                  data-testid={ `${index}-horizontal-image` }
+                />
+                <p data-testid={ `${index}-horizontal-top-text` }>
+                  {`${receita.nationality} - ${receita.category}`}
+                </p>
+                <p data-testid={ `${index}-horizontal-name` }>
+                  {`${receita.name}`}
+                </p>
+              </Link>
               <button
                 src={ shareIcon }
                 data-testid={ `${index}-horizontal-share-btn` }
@@ -100,17 +104,20 @@ function FavoriteRecipes() {
         }
         return (
           <div key={ index }>
-            <img
-              src={ receita.image }
-              alt="Imagem da receita favoritada"
-              data-testid={ `${index}-horizontal-image` }
-            />
-            <p data-testid={ `${index}-horizontal-top-text` }>
-              {`${receita.alcoholicOrNot}`}
-            </p>
-            <p data-testid={ `${index}-horizontal-name` }>
-              {`${receita.name}`}
-            </p>
+            <Link to={ `/${receita.type}s/${receita.id}` }>
+              <img
+                className="imgComida"
+                src={ receita.image }
+                alt="Imagem da receita favoritada"
+                data-testid={ `${index}-horizontal-image` }
+              />
+              <p data-testid={ `${index}-horizontal-top-text` }>
+                {`${receita.alcoholicOrNot}`}
+              </p>
+              <p data-testid={ `${index}-horizontal-name` }>
+                {`${receita.name}`}
+              </p>
+            </Link>
             <button
               src={ shareIcon }
               data-testid={ `${index}-horizontal-share-btn` }

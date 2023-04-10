@@ -45,6 +45,11 @@
   font-weight: 900;
 }
 
+.imgComida {
+  height: 30%;
+  width: 30%;
+}
+
 @keyframes shake {
 
   0% {
