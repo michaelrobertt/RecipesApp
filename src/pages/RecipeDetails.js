@@ -1,16 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useHistory } from 'react-router-dom';
 import RecommendationCard from '../components/RecommendationCard';
 import AppContext from '../context/AppContext';
 
 function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
   const { setRecomendacoes } = useContext(AppContext);
+  const history = useHistory();
   const [receita, setReceita] = useState();
   const [ingredientes, setingredientes] = useState(null);
   const [tipo, setTipo] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [receitaCompleta, setReceitaCompleta] = useState(false);
-  const doneRecipes = JSON.parse(localStorage.getItem('doneRecipes'));
+  const [receitaEmAndamento, setReceitaEmAndamento] = useState(false);
+  const receitasProntas = JSON.parse(localStorage.getItem('doneRecipes'));
+  const receitasComecadas = JSON.parse(localStorage.getItem('inProgressRecipes'));
 
   useEffect(() => {
     const requisicaoDeReceita = async () => {
@@ -50,14 +54,29 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
   }, [receita]);
 
   useEffect(() => {
-    if (doneRecipes) {
-      doneRecipes.forEach((item) => {
+    if (receitasProntas) {
+      receitasProntas.forEach((item) => {
         if (item.id === id) {
           setReceitaCompleta(true);
         }
       });
     }
-  }, [doneRecipes]);
+  }, [receitasProntas]);
+
+  useEffect(() => {
+    if (receitasComecadas && tipo) {
+      const idReceitasComecadas = Object.keys(receitasComecadas[tipo]);
+      idReceitasComecadas.forEach((item) => {
+        if (item === id) {
+          setReceitaEmAndamento(true);
+        }
+      });
+    }
+  }, [receitasComecadas, tipo]);
+
+  const iniciarReceita = () => {
+    history.push(`${pathname}/in-progress`);
+  };
 
   useEffect(() => {
     if (ingredientes) {
@@ -123,13 +142,25 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
         <button
           type="button"
           data-testid="start-recipe-btn"
-          onClick={ startRecipe }
+          onClick={ iniciarReceita }
           style={ {
             position: 'fixed',
             bottom: 0,
           } }
         >
           Start Recipe
+        </button>) : null}
+      {receitaEmAndamento ? (
+        <button
+          type="button"
+          data-testid="start-recipe-btn"
+          onClick={ iniciarReceita }
+          style={ {
+            position: 'fixed',
+            bottom: 0,
+          } }
+        >
+          Continue Recipe
         </button>) : null}
     </div>
   );
