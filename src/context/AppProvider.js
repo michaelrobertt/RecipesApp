@@ -4,11 +4,16 @@ import AppContext from './AppContext';
 
 function AppProvider({ children }) {
   const [respostaDaPesquisa, setRespostaDaPesquisa] = useState();
+  const [recomendacoes, setRecomendacoes] = useState();
 
   const values = useMemo(() => ({
     respostaDaPesquisa,
     setRespostaDaPesquisa,
+    recomendacoes,
+    setRecomendacoes,
   }), [
+    recomendacoes,
+    setRecomendacoes,
     respostaDaPesquisa,
     setRespostaDaPesquisa,
   ]);
