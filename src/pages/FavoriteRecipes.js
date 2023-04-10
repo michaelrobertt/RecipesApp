@@ -8,6 +8,7 @@ function FavoriteRecipes() {
   const [receitasSalvas, setReceitasSalvas] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [linkCopiado, setLinkCopiado] = useState(false);
+  const [filtro, setFiltro] = useState('all');
 
   useEffect(() => {
     const receitasDoUsuario = localStorage.getItem('favoriteRecipes');
@@ -33,18 +34,38 @@ function FavoriteRecipes() {
     localStorage.setItem('favoriteRecipes', JSON.stringify(receitasFiltradas));
   };
 
+  let receitasFiltradas = receitasSalvas;
+  if (filtro !== 'all') {
+    receitasFiltradas = receitasSalvas.filter((receita) => receita.type === filtro);
+  }
+
   return (
     <div>
       <Header pesquisaOff titulo="Favorite Recipes" />
-      <button data-testid="filter-by-all-btn">All</button>
-      <button data-testid="filter-by-meal-btn">Food</button>
-      <button data-testid="filter-by-drink-btn">Drinks</button>
+      <button
+        data-testid="filter-by-all-btn"
+        onClick={ () => setFiltro('all') }
+      >
+        All
+      </button>
+      <button
+        data-testid="filter-by-meal-btn"
+        onClick={ () => setFiltro('meal') }
+      >
+        Food
+      </button>
+      <button
+        data-testid="filter-by-drink-btn"
+        onClick={ () => setFiltro('drink') }
+      >
+        Drinks
+      </button>
       {carregando ? (
         <p>Carregando...</p>
       ) : (
         <div>
           {receitasSalvas
-      && receitasSalvas.map((receita, index) => {
+      && receitasFiltradas.map((receita, index) => {
         if (receita.type === 'meal') {
           return (
             <div key={ index }>
