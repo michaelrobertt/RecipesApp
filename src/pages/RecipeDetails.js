@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
   // const { respostaDaPesquisa, setRespostaDaPesquisa } = useContext(AppContext);
   const [receita, setReceita] = useState();
-  const [recomendacoes, setRecomendacoes] = useState();
+  const [setRecomendacoes] = useState();
   const [ingredientes, setingredientes] = useState(null);
   const [tipo, setTipo] = useState(null);
   const [carregando, setCarregando] = useState(true);
