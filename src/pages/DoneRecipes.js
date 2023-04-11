@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
+import shareIcon from '../images/shareIcon.svg';
 
 function DoneRecipes() {
   const dateNow = new Date();
@@ -38,11 +39,11 @@ function DoneRecipes() {
             image,
             /* id, */
             name,
-            /* nationality, */
+            nationality,
             category,
             tags,
-            /* alcoholicOrNot,
-              type, */
+            alcoholicOrNot,
+            type,
             doneDate,
           } = done;
           console.log(typeof tags);
@@ -53,13 +54,14 @@ function DoneRecipes() {
                 alt={ name }
                 data-testid={ `${index}-horizontal-image` }
               />
+
               <span data-testid={ `${index}-horizontal-top-text` }>
-                {category}
+                { type === 'meal' ? `${nationality} - ${category}` : alcoholicOrNot}
               </span>
-              <h3 data-testid={ `${index}-horizontal-name` }>{name}</h3>
-              <p data-testid={ `${index}-horizontal-done-date` }>{doneDate}</p>
               {
-                tags.length > 0 && tags.map((tag) => (
+                type === 'meal'
+                && tags.length > 0
+                && tags.map((tag) => (
                   <span
                     key={ tag }
                     data-testid={ `${index}-${tag}-horizontal-tag` }
@@ -68,33 +70,21 @@ function DoneRecipes() {
                   </span>
                 ))
               }
-              <button type="button" data-testid={ `${index}-horizontal-share-btn` }>
+
+              <h3 data-testid={ `${index}-horizontal-name` }>{name}</h3>
+              <p data-testid={ `${index}-horizontal-done-date` }>{doneDate}</p>
+
+              <button
+                src={ shareIcon }
+                type="button"
+                data-testid={ `${index}-horizontal-share-btn` }
+              >
                 Share
               </button>
             </div>
           );
         })
       }
-      {/* {
-          receitaFeita.filter((done) => filtro.includes(done.type))
-            .map((done, index) => (
-              <div key={ done }>
-                <img
-                  src={ done.image }
-                  alt={ done.name }
-                  data-testid={ `${index}-horizontal-image` }
-                />
-                <span data-testid={ `${index}-horizontal-top-text` }>
-                  {done.category}
-                </span>
-                <h3 data-testid={ `${index}-horizontal-name` }>{done.name}</h3>
-                <p data-testid={ `${index}-horizontal-done-date` }>{done.doneDate}</p>
-                <span data-testid={ `${index}-horizontal-done-date` }>
-                  {recipe.doneDate}
-                </span>
-              </div>
-            ))
-        } */}
     </div>
   );
 }
