@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Copy from 'clipboard-copy';
+import shareIcon from '../images/shareIcon.svg';
 
 function ShareButton() {
   const { href } = window.location;
@@ -17,7 +18,7 @@ function ShareButton() {
         data-testid="share-btn"
         onClick={ copiarLink }
       >
-        Share
+        <img src={ shareIcon } alt="Share button" />
       </button>
       {copiado && <p>Link copied!</p> }
     </div>
