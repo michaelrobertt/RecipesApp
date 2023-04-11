@@ -53,49 +53,54 @@ function Drinks() {
   };
 
   return (
-    <div>
+    <div className="secaoComidaDrink">
       <Header titulo="Drinks" />
-      <button
-        type="button"
-        className="drinks-btnCategory"
-        onClick={ () => { requisicaoPadrao(); } }
-        data-testid="All-category-filter"
-      >
-        All
-      </button>
-      { categoriaBebida && categoriaBebida.map((ele, index2) => (
-        <div key={ index2 }>
-          <button
-            type="button"
-            className="drinks-btnCategory"
-            id={ ele.strCategory }
-            data-testid={ `${ele.strCategory}-category-filter` }
-            onClick={ () => requisicaoPorCategoria(ele.strCategory) }
-          >
-            { ele.strCategory }
-          </button>
-        </div>
-      ))}
-      {carregando ? (<p>carregando...</p>) : (
-        renderizaReceita.map((receita, index) => (
-          <div key={ receita.idDrink }>
-            <Link
-              to={ `/drinks/${receita.idDrink}` }
-              data-testid={ `${index}-recipe-card` }
+      <div className="botaoMealsDrink">
+        <button
+          type="button"
+          className="drinks-btnCategory"
+          onClick={ () => { requisicaoPadrao(); } }
+          data-testid="All-category-filter"
+        >
+          All
+        </button>
+        { categoriaBebida && categoriaBebida.map((ele, index2) => (
+          <div key={ index2 }>
+            <button
+              type="button"
+              className="drinks-btnCategory"
+              id={ ele.strCategory }
+              data-testid={ `${ele.strCategory}-category-filter` }
+              onClick={ () => requisicaoPorCategoria(ele.strCategory) }
             >
-              <div>
-                <img
-                  src={ receita.strDrinkThumb }
-                  alt="Foto da comida"
-                  data-testid={ `${index}-card-img` }
-                />
-                <p data-testid={ `${index}-card-name` }>{receita.strDrink}</p>
-              </div>
-            </Link>
+              { ele.strCategory }
+            </button>
           </div>
-        ))
-      )}
-      <Footer />
+        ))}
+      </div>
+      <div className="cardapio">
+        {carregando ? (<p>carregando...</p>) : (
+          renderizaReceita.map((receita, index) => (
+            <div className="comidaCard" key={ receita.idDrink }>
+              <Link
+                className="receitaLink"
+                to={ `/drinks/${receita.idDrink}` }
+                data-testid={ `${index}-recipe-card` }
+              >
+                <div>
+                  <img
+                    src={ receita.strDrinkThumb }
+                    alt="Foto da comida"
+                    data-testid={ `${index}-card-img` }
+                  />
+                  <p data-testid={ `${index}-card-name` }>{receita.strDrink}</p>
+                </div>
+              </Link>
+            </div>
+          ))
+        )}
+        <Footer />
+      </div>
     </div>
   );
 }

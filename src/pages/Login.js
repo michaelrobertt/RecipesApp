@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import logotipo from '../images/cd801da56823450284fdd14af4c8473b.png';
 
 function Login({ history }) {
   const [email, setEmail] = useState('');
@@ -26,32 +27,37 @@ function Login({ history }) {
   };
 
   return (
-    <form>
-      <h1>Login</h1>
-      <input
-        type="email"
-        data-testid="email-input"
-        name="email"
-        value={ email }
-        onChange={ (e) => setEmail(e.target.value) }
-      />
-      <input
-        type="password"
-        data-testid="password-input"
-        name="password"
-        value={ senha }
-        onChange={ (e) => setSenha(e.target.value) }
-      />
-      <button
-        type="submit"
-        data-testid="login-submit-btn"
-        disabled={ btnDesabilitado }
-        onClick={ salvarDados }
-      >
-        Login
-
-      </button>
-    </form>
+    <div className="login">
+      <img src={ logotipo } className="logotipoLogin" alt="logotipo" />
+      <form>
+        <h4>Email:</h4>
+        <input
+          type="email"
+          data-testid="email-input"
+          name="email"
+          value={ email }
+          onChange={ (e) => setEmail(e.target.value) }
+          placeholder="Digite seu email"
+        />
+        <h4 className="senha">Senha:</h4>
+        <input
+          type="password"
+          data-testid="password-input"
+          name="password"
+          value={ senha }
+          onChange={ (e) => setSenha(e.target.value) }
+          placeholder="Digite sua senha"
+        />
+        <button
+          type="submit"
+          data-testid="login-submit-btn"
+          disabled={ btnDesabilitado }
+          onClick={ salvarDados }
+        >
+          Login
+        </button>
+      </form>
+    </div>
   );
 }
 

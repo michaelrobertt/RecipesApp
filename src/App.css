@@ -1,3 +1,9 @@
+* {
+  font-family: Roboto Condensed , sans-serif , Segoe UI , Verdana , sans-serif;
+  margin: 0%;
+  padding: 0%;
+}
+
 .meals {
   align-items: center;
   background: #7cfaca;
@@ -15,19 +21,201 @@
   max-height: 80vh;
 }
 
-/*
-#iceLeft {
-  animation: clink .8s infinite ease;
-  opacity: 0.6;
-  transform-origin: 36px 66px;
+.login {
+  align-items: center;
+  background-color: #efe5df;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
+  width: 100vw;
 }
 
-#iceRight {
-  animation: clink .8s .2s infinite ease;
-  opacity: 0.6;
-  transform-origin: 60px 78px;
+.senha {
+  margin-top: 10px;
 }
-*/
+
+.login > .logotipoLogin {
+  display: block;
+  height: 50vw;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50vw;
+}
+
+.login > form {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 40vh;
+  justify-content: center;
+  width: 80vw;
+}
+
+.login > form > input {
+  background-color: white;
+  border-color: #ccc;
+  border-radius: 0;
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: 0 0 5px rgba(66, 66, 66, 0.75);
+  color: black;
+  font-size: 16px;
+  padding: 5px;
+  text-shadow: -50px 0 0 rgba(66, 66, 66, 0);
+  width: 80%;
+}
+
+.headerButton > button {
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 5px;
+}
+
+.botaoMealsDrink > button {
+  background-color: #ff8000;
+  border: none;
+  border-radius: 50px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0 5px 15px 0;
+  color: white;
+  display: flex;
+  flex-wrap: wrap;
+  font-family: Roboto , sans-serif;
+  font-size: 14px;
+  font-weight: 0;
+  justify-content: space-around;
+  margin-bottom: 10px;
+  padding: 10px 30px;
+  transform: translateY(0);
+  transition: 1000ms;
+  width: 98%;
+}
+
+.login > form > button {
+  background-color: #04aa6d;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin: 4px 2px;
+  margin-top: 5%;
+  padding: 5px 20px;
+  text-decoration: none;
+}
+
+.botaoMealsDrink > button:hover {
+  background-color: #ff8000;
+}
+
+.login > form > button:disabled {
+  border-radius: 4px;
+  color: white;
+  cursor: not-allowed;
+  float: left;
+  opacity: 0.6;
+}
+
+.Header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  width: 100%;
+}
+
+.headerButton {
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+.secaoComidaDrink {
+  width: 100%;
+}
+
+.botaoMealsDrink {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  width: 100%;
+}
+
+
+.meals-btnCategory {
+  background-color: #ff8000;
+  border: none;
+  border-radius: 50px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0 5px 15px 0;
+  color: white;
+  font-family: Roboto , sans-serif;
+  font-size: 14px;
+  font-weight: 0;
+  margin-bottom: 10px;
+  padding: 5px 15px;
+  transform: translateY(0);
+  transition: 1000ms;
+}
+
+.meals-btnCategory:hover {
+  background-color: #ff8000e2;
+  border: none;
+  color: black;
+  opacity: 0.6;
+  transition: 1000ms;
+}
+
+.drinks-btnCategory {
+  background-color: #ff8000;
+  border: none;
+  border-radius: 50px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0 5px 15px 0;
+  color: white;
+  font-family: Roboto , sans-serif;
+  font-size: 14px;
+  font-weight: 0;
+  margin-bottom: 10px;
+  padding: 5px 15px;
+  transform: translateY(0);
+  transition: 1000ms;
+}
+
+.drinks-btnCategory:hover {
+  background-color: #ff8000e2;
+  border: none;
+  color: black;
+  opacity: 0.6;
+  transition: 1000ms;
+}
+
+.cardapio {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.comidaCard {
+  margin: 10px;
+  text-align: center;
+  width: 40%;
+}
+
+.comidaCard img {
+  border: 1px solid #ddd;
+  border-radius: 10%;
+  max-height: 200px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.receitaLink {
+  color: black;
+  text-decoration: none;
+}
+
+.receitaLink:hover {
+  color: orangered;
+  text-decoration: none;
+  transition: 0.5s;
+}
 
 .footer {
   bottom: 0;
@@ -35,7 +223,6 @@
   position: fixed;
   transform: translateX(-50%);
 }
-
 
 .meals > .logo {
   animation: shake 1.5s infinite ease;
