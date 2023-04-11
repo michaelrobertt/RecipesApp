@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import shareIcon from '../images/shareIcon.svg';
 import whiteHeartIcon from '../images/whiteHeartIcon.svg';
+import '../App.css';
 
-function InProgress({ match: { params: { id } }, location: { pathname } }) {
+function RecipeInProgress({ match: { params: { id } }, location: { pathname } }) {
   const [receita, setReceita] = useState();
   const [ingredientes, setingredientes] = useState(null);
   const [tipo, setTipo] = useState(null);
   const [carregando, setCarregando] = useState(true);
+  const [selectedIngredients, setSelectedIngredients] = useState([]);
 
   useEffect(() => {
     const requisicaoDeReceita = async () => {
@@ -22,6 +24,7 @@ function InProgress({ match: { params: { id } }, location: { pathname } }) {
       }
     };
     requisicaoDeReceita();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -46,6 +49,16 @@ function InProgress({ match: { params: { id } }, location: { pathname } }) {
     }
   }, [ingredientes]);
 
+  const handleCheckboxChange = (event) => {
+    const { value } = event.target;
+
+    if (selectedIngredients.includes(value)) {
+      setSelectedIngredients(selectedIngredients.filter((item) => item !== value));
+    } else {
+      setSelectedIngredients([...selectedIngredients, value]);
+    }
+  };
+
   if (carregando) { return <h1>Carregando...</h1>; }
   return (
     <div>
@@ -69,13 +82,15 @@ function InProgress({ match: { params: { id } }, location: { pathname } }) {
             data-testid="favorite-btn"
             // onClick={ () => funcaoBotaoDesfavoritar(receita.id) }
           >
-            <img src={ whiteHeartIcon } alt="Botão Desfavoritar" />
+            <img src={ whiteHeartIcon } alt="Botão Favoritar" />
           </button>
           <p data-testid="recipe-category">{receita[tipo][0].strCategory}</p>
           <h2>Ingredients</h2>
           {ingredientes.map((elemento, index) => (
             <div key={ index }>
               <label
+                className={ selectedIngredients.includes(receita[tipo][0][elemento])
+                  ? 'strike' : '' }
                 htmlFor={ receita.meals.idMeal }
                 key={ index }
                 data-testid={ `${index}-ingredient-step` }
@@ -85,8 +100,8 @@ function InProgress({ match: { params: { id } }, location: { pathname } }) {
                   id={ receita.meals.idMeal }
                   name={ receita[tipo][0][elemento] }
                   value={ receita[tipo][0][elemento] }
-                // checked={ selectedCheckboxes.includes(item.label) }
-                // onChange={ handleCheckboxChange }
+                  checked={ selectedIngredients.includes(receita[tipo][0][elemento]) }
+                  onChange={ handleCheckboxChange }
                 />
                 {receita[tipo][0][elemento]}
                 {' '}
@@ -117,13 +132,15 @@ function InProgress({ match: { params: { id } }, location: { pathname } }) {
             data-testid="favorite-btn"
             // onClick={ () => funcaoBotaoDesfavoritar(receita.id) }
           >
-            <img src={ whiteHeartIcon } alt="Botão Desfavoritar" />
+            <img src={ whiteHeartIcon } alt="Botão Favoritar" />
           </button>
           <p data-testid="recipe-category">{receita[tipo][0].strAlcoholic}</p>
           <h2>Ingredients</h2>
           {ingredientes.map((elemento, index) => (
             <div key={ index }>
               <label
+                className={ selectedIngredients.includes(receita[tipo][0][elemento])
+                  ? 'strike' : '' }
                 key={ index }
                 data-testid={ `${index}-ingredient-step` }
                 htmlFor={ receita.drinks.idDrinks }
@@ -133,8 +150,8 @@ function InProgress({ match: { params: { id } }, location: { pathname } }) {
                   id={ receita.drinks.idDrinks }
                   name={ receita[tipo][0][elemento] }
                   value={ receita[tipo][0][elemento] }
-                // checked={ selectedCheckboxes.includes(item.label) }
-                // onChange={ handleCheckboxChange }
+                  checked={ selectedIngredients.includes(receita[tipo][0][elemento]) }
+                  onChange={ handleCheckboxChange }
                 />
                 {receita[tipo][0][elemento]}
                 {' '}
@@ -151,7 +168,7 @@ function InProgress({ match: { params: { id } }, location: { pathname } }) {
   );
 }
 
-InProgress.propTypes = {
+RecipeInProgress.propTypes = {
   location: PropTypes.shape({
     pathname: PropTypes.string,
   }),
@@ -162,4 +179,4 @@ InProgress.propTypes = {
   }),
 }.isRequired;
 
-export default InProgress;
+export default RecipeInProgress;
