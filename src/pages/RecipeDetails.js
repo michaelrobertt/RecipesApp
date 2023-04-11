@@ -7,9 +7,8 @@ import ShareButton from '../components/ShareButton';
 import FavoriteButton from '../components/FavoriteButton';
 
 function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
-  const { setRecomendacoes } = useContext(AppContext);
+  const { setRecomendacoes, receita, setReceita } = useContext(AppContext);
   const history = useHistory();
-  const [receita, setReceita] = useState();
   const [ingredientes, setingredientes] = useState(null);
   const [tipo, setTipo] = useState(null);
   const [carregando, setCarregando] = useState(true);
