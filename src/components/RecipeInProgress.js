@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
-import whiteHeartIcon from '../images/whiteHeartIcon.svg';
+import AppContext from '../context/AppContext';
+import ShareButton from './ShareButton';
+import FavoriteButton from './FavoriteButton';
 import '../App.css';
 import ShareButton from './ShareButton';
 
 function RecipeInProgress({ match: { params: { id } }, location: { pathname } }) {
-  const [receita, setReceita] = useState();
+  const { receita, setReceita } = useContext(AppContext);
   const [ingredientes, setingredientes] = useState(null);
   const [tipo, setTipo] = useState(null);
   const [carregando, setCarregando] = useState(true);
@@ -77,13 +79,7 @@ function RecipeInProgress({ match: { params: { id } }, location: { pathname } })
           />
           <h1 data-testid="recipe-title">{receita[tipo][0].strMeal}</h1>
           <ShareButton />
-          <button
-            src={ whiteHeartIcon }
-            data-testid="favorite-btn"
-            // onClick={ () => funcaoBotaoDesfavoritar(receita.id) }
-          >
-            <img src={ whiteHeartIcon } alt="Botão Favoritar" />
-          </button>
+          <FavoriteButton />
           <p data-testid="recipe-category">{receita[tipo][0].strCategory}</p>
           <h2>Ingredients</h2>
           {ingredientes.map((elemento, index) => (
@@ -121,13 +117,7 @@ function RecipeInProgress({ match: { params: { id } }, location: { pathname } })
           />
           <h1 data-testid="recipe-title">{receita[tipo][0].strDrink}</h1>
           <ShareButton />
-          <button
-            src={ whiteHeartIcon }
-            data-testid="favorite-btn"
-            // onClick={ () => funcaoBotaoDesfavoritar(receita.id) }
-          >
-            <img src={ whiteHeartIcon } alt="Botão Favoritar" />
-          </button>
+          <FavoriteButton />
           <p data-testid="recipe-category">{receita[tipo][0].strAlcoholic}</p>
           <h2>Ingredients</h2>
           {ingredientes.map((elemento, index) => (
