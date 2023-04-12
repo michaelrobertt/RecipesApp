@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+/* import clipboardCopy from 'clipboard-copy'; */
 import Header from '../components/Header';
 import shareIcon from '../images/shareIcon.svg';
 
 function DoneRecipes() {
   const dateNow = new Date();
+  const [linkCopied, setLinkCopied] = useState(false);
   const [receitaFeita, setReceitaFeita] = useState([
     {
       id: '178319',
@@ -76,11 +78,21 @@ function DoneRecipes() {
 
               <button
                 src={ shareIcon }
+                onClick={ () => {
+                  navigator.clipboard.writeText(`http://localhost:3000/${done.type}s/${done.id}`)
+                    .then(
+                      () => { setLinkCopied(true); },
+                      () => { setLinkCopied(false); },
+                    );
+                } }
                 type="button"
                 data-testid={ `${index}-horizontal-share-btn` }
               >
                 Share
               </button>
+              {
+                linkCopied && <p>Link copied!</p>
+              }
             </div>
           );
         })
