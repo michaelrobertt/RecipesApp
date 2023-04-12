@@ -20,27 +20,33 @@ function Profile() {
   }, []);
 
   return (
-    <div>
+    <div className="profile">
       <Header pesquisaOff titulo="Profile" />
-      <h2 data-testid="profile-email">{`${email}`}</h2>
-      <button
-        onClick={ () => history.push('/done-recipes') }
-        data-testid="profile-done-btn"
-      >
-        Done Recipes
-      </button>
-      <button
-        onClick={ () => history.push('/favorite-recipes') }
-        data-testid="profile-favorite-btn"
-      >
-        Favorite Recipes
-      </button>
-      <button
-        onClick={ funcaoLogout }
-        data-testid="profile-logout-btn"
-      >
-        Logout
-      </button>
+      <div className="profile-itens">
+        <h4>Bem vindo,</h4>
+        <h2 data-testid="profile-email">{`${email}`}</h2>
+        <button
+          className="profile-btn"
+          onClick={ () => history.push('/done-recipes') }
+          data-testid="profile-done-btn"
+        >
+          Done Recipes
+        </button>
+        <button
+          className="profile-btn"
+          onClick={ () => history.push('/favorite-recipes') }
+          data-testid="profile-favorite-btn"
+        >
+          Favorite Recipes
+        </button>
+        <button
+          className="profile-btn-logout"
+          onClick={ funcaoLogout }
+          data-testid="profile-logout-btn"
+        >
+          Logout
+        </button>
+      </div>
       <Footer />
     </div>
   );
