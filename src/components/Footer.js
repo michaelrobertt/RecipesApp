@@ -8,20 +8,24 @@ function Footer() {
   return (
     <footer className="footer" data-testid="footer">
       <button
+        className="footer-btn"
         src={ mealIcon }
         type="button"
         data-testid="meals-bottom-btn"
         onClick={ () => { history.push('/meals'); } }
       >
-        <img src={ mealIcon } alt="página de comidas" />
+        <img className="footer-img" src={ mealIcon } alt="página de comidas" />
+        <p className="footer-p">Foods</p>
       </button>
       <button
+        className="footer-btn"
         src={ drinkIcon }
         type="button"
         data-testid="drinks-bottom-btn"
         onClick={ () => { history.push('/drinks'); } }
       >
-        <img src={ drinkIcon } alt="página de bebidas" />
+        <img className="footer-img" src={ drinkIcon } alt="página de bebidas" />
+        <p className="footer-p">Drinks</p>
       </button>
     </footer>
   );
