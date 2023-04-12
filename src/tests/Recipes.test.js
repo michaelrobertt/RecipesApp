@@ -1,9 +1,7 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
-// import { beforeEach } from 'mocha';
 import renderWithRouter from './helpers/renderWithRouter';
-import App from '../App';
 import AppProvider from '../context/AppProvider';
 import Recipes from '../pages/Recipes';
 import fetch from '../../cypress/mocks/fetch';
