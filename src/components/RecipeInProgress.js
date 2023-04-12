@@ -4,6 +4,7 @@ import AppContext from '../context/AppContext';
 import ShareButton from './ShareButton';
 import FavoriteButton from './FavoriteButton';
 import '../App.css';
+import ShareButton from './ShareButton';
 
 function RecipeInProgress({ match: { params: { id } }, location: { pathname } }) {
   const { receita, setReceita } = useContext(AppContext);

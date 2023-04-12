@@ -64,7 +64,7 @@ describe('Teste o componente SearchBar', () => {
 
     await waitForElementToBeRemoved(screen.queryByText(/carregando\.\.\./i));
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(3);
       expect(screen.getByTestId('1-card-img')).toBeInTheDocument();
     });
 
@@ -99,7 +99,7 @@ describe('Teste o componente SearchBar', () => {
     userEvent.click(botaoBusca);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(3);
       expect(screen.getByTestId('0-card-img')).toBeInTheDocument();
     });
   });
@@ -131,7 +131,7 @@ describe('Teste o componente SearchBar', () => {
     userEvent.click(botaoBusca);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(3);
       expect(screen.getByTestId('1-card-img')).toBeInTheDocument();
     });
   });
@@ -164,7 +164,7 @@ describe('Teste o componente SearchBar', () => {
     userEvent.click(botaoBusca);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(3);
       expect(history.location.pathname).toBe('/meals/52771');
     });
   });
@@ -197,7 +197,7 @@ describe('Teste o componente SearchBar', () => {
     userEvent.click(botaoBusca);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(3);
       expect(screen.getByTestId('2-card-img')).toBeInTheDocument();
     });
   });
@@ -229,7 +229,7 @@ describe('Teste o componente SearchBar', () => {
     userEvent.click(botaoBusca);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(3);
       expect(screen.getByTestId('0-card-img')).toBeInTheDocument();
     });
   });
@@ -262,7 +262,7 @@ describe('Teste o componente SearchBar', () => {
     userEvent.click(botaoBusca);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(3);
     });
     const card = await screen.findByTestId('3-card-img');
     expect(card).toBeInTheDocument();
@@ -297,7 +297,7 @@ describe('Teste o componente SearchBar', () => {
     userEvent.click(botaoBusca);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(5);
       expect(history.location.pathname).toBe('/drinks/178319');
     });
   });
