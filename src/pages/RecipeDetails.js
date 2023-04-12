@@ -66,6 +66,8 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
 
   useEffect(() => {
     if (receitasComecadas && tipo) {
+      console.log(receitasComecadas);
+      console.log(tipo);
       const idReceitasComecadas = Object.keys(receitasComecadas[tipo]);
       idReceitasComecadas.forEach((item) => {
         if (item === id) {

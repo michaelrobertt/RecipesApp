@@ -29,54 +29,69 @@ function SearchBar() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comidaDados]);
 
-  const pesquisarComida = async () => {
-    if (tipoDePesquisa === 'primeiraLetra' && refeicaoPesquisada.length > 1) {
-      global.alert('Your search must have only 1 (one) character');
-    } if (tipoDePesquisa === 'ingrediente') {
+  const pesquisarComidaIngrediente = async () => {
+    if (tipoDePesquisa === 'ingrediente' && refeicaoPesquisada !== '') {
       const requisicao = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${refeicaoPesquisada}`);
       const dados = await requisicao.json();
-      if (dados.meals === null || refeicaoPesquisada === '') {
+      if (dados.meals === null) {
         global.alert(alerta);
       }
       return setComidaDados(dados.meals);
-    } if (tipoDePesquisa === 'nome') {
+    }
+  };
+
+  const pesquisarComidaNome = async () => {
+    if (tipoDePesquisa === 'nome' && refeicaoPesquisada !== '') {
       const requisicaoNome = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${refeicaoPesquisada}`);
       const dadosNome = await requisicaoNome.json();
-      if (dadosNome.meals === null || refeicaoPesquisada === '') {
+      if (dadosNome.meals === null) {
         global.alert(alerta);
       }
       return setComidaDados(dadosNome.meals);
-    } if (tipoDePesquisa === 'primeiraLetra') {
+    }
+  };
+
+  const pesquisarComidaLetra = async () => {
+    if (tipoDePesquisa === 'primeiraLetra' && refeicaoPesquisada !== ''
+    && refeicaoPesquisada.length === 1) {
       const requisicaoLetra = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?f=${refeicaoPesquisada}`);
       const dadosLetra = await requisicaoLetra.json();
-      if (dadosLetra.meals === null || refeicaoPesquisada === '') {
+      if (dadosLetra.meals === null) {
         global.alert(alerta);
       }
       return setComidaDados(dadosLetra.meals);
     }
   };
 
-  const pesquisarBebida = async () => {
-    if (tipoDePesquisa === 'primeiraLetra' && refeicaoPesquisada.length > 1) {
-      global.alert('Your search must have only 1 (one) character');
-    } if (tipoDePesquisa === 'ingrediente') {
-      if (refeicaoPesquisada !== '') {
+  const pesquisarBebidaIngrediente = async () => {
+    if (tipoDePesquisa === 'ingrediente' && refeicaoPesquisada !== '') {
+      try {
         const requisicao = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${refeicaoPesquisada}`);
         const dados = await requisicao.json();
         return setComidaDados(dados.drinks);
+      } catch (erro) {
+        global.alert(alerta);
       }
-      global.alert(alerta);
-    } if (tipoDePesquisa === 'nome') {
+    }
+  };
+
+  const pesquisarBebidaNome = async () => {
+    if (tipoDePesquisa === 'nome' && refeicaoPesquisada !== '') {
       const requisicaoNome = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${refeicaoPesquisada}`);
       const dadosNome = await requisicaoNome.json();
-      if (dadosNome.drinks === null || refeicaoPesquisada === '') {
+      if (dadosNome.drinks === null) {
         global.alert(alerta);
       }
       return setComidaDados(dadosNome.drinks);
-    } if (tipoDePesquisa === 'primeiraLetra') {
+    }
+  };
+
+  const pesquisarBebidaLetra = async () => {
+    if (tipoDePesquisa === 'primeiraLetra' && refeicaoPesquisada !== ''
+    && refeicaoPesquisada.length === 1) {
       const requisicaoLetra = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?f=${refeicaoPesquisada}`);
       const dadosLetra = await requisicaoLetra.json();
-      if (dadosLetra.drinks === null || refeicaoPesquisada === '') {
+      if (dadosLetra.drinks === null) {
         global.alert(alerta);
       }
       return setComidaDados(dadosLetra.drinks);
@@ -84,11 +99,16 @@ function SearchBar() {
   };
 
   const pesquisar = () => {
-    if (location.pathname === '/meals') {
-      pesquisarComida();
-    }
-    if (location.pathname === '/drinks') {
-      pesquisarBebida();
+    if (tipoDePesquisa === 'primeiraLetra' && refeicaoPesquisada.length > 1) {
+      global.alert('Your search must have only 1 (one) character');
+    } if (location.pathname === '/meals') {
+      pesquisarComidaIngrediente();
+      pesquisarComidaNome();
+      pesquisarComidaLetra();
+    } if (location.pathname === '/drinks') {
+      pesquisarBebidaIngrediente();
+      pesquisarBebidaNome();
+      pesquisarBebidaLetra();
     }
   };
 

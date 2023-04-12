@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import shareIcon from '../images/shareIcon.svg';
 import whiteHeartIcon from '../images/whiteHeartIcon.svg';
 import '../App.css';
+import ShareButton from './ShareButton';
 
 function RecipeInProgress({ match: { params: { id } }, location: { pathname } }) {
   const [receita, setReceita] = useState();
@@ -76,13 +76,7 @@ function RecipeInProgress({ match: { params: { id } }, location: { pathname } })
             data-testid="recipe-photo"
           />
           <h1 data-testid="recipe-title">{receita[tipo][0].strMeal}</h1>
-          <button
-            src={ shareIcon }
-            data-testid="share-btn"
-            // onClick={ () => funcaoBotaoCompartilhar(receita.type, receita.id) }
-          >
-            <img src={ shareIcon } alt="Botão Compartilhar" />
-          </button>
+          <ShareButton />
           <button
             src={ whiteHeartIcon }
             data-testid="favorite-btn"
@@ -126,13 +120,7 @@ function RecipeInProgress({ match: { params: { id } }, location: { pathname } })
             data-testid="recipe-photo"
           />
           <h1 data-testid="recipe-title">{receita[tipo][0].strDrink}</h1>
-          <button
-            src={ shareIcon }
-            data-testid="share-btn"
-            // onClick={ () => funcaoBotaoCompartilhar(receita.type, receita.id) }
-          >
-            <img src={ shareIcon } alt="Botão Compartilhar" />
-          </button>
+          <ShareButton />
           <button
             src={ whiteHeartIcon }
             data-testid="favorite-btn"
