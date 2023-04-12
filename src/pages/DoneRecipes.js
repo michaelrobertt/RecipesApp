@@ -92,6 +92,7 @@ function DoneRecipes() {
               </button>
               {
                 linkCopied && <p>Link copied!</p>
+
               }
             </div>
           );
