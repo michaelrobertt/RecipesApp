@@ -82,6 +82,7 @@ function FavoriteButton() {
         type="button"
         data-testid="favorite-btn"
         onClick={ atualizarLocalStorage }
+        className="recipe-btns"
         src={ (receitaFavorita) ? blackHeartIcon : whiteHeartIcon }
       >
         <img

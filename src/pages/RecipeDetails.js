@@ -36,6 +36,7 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
       }
     };
     requisicaoDeReceita();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -62,6 +63,7 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
         }
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receitasProntas]);
 
   useEffect(() => {
@@ -75,7 +77,8 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
         }
       });
     }
-  }, [receitasComecadas]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [receitasComecadas, tipo]);
 
   const iniciarReceita = () => {
     history.push(`${pathname}/in-progress`);
@@ -85,63 +88,124 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
     if (ingredientes) {
       setCarregando(false);
     }
-  }, [ingredientes]);
-
-  console.log(receitasComecadas);
+  }, [receitasComecadas, tipo]);
 
   if (carregando) { return <h1>Carregando...</h1>; }
   return (
     <div>
-      <ShareButton />
-      <FavoriteButton />
       {!pathname.includes('drinks') ? (
-        <section>
-          <img
-            src={ receita[tipo][0].strMealThumb }
-            alt={ receita[tipo][0].strMeal }
-            data-testid="recipe-photo"
-          />
-          <h3 data-testid="recipe-title">{receita[tipo][0].strMeal}</h3>
-          <p data-testid="recipe-category">{receita[tipo][0].strCategory}</p>
-          {ingredientes.map((elemento, index) => (
-            <p key={ index } data-testid={ `${index}-ingredient-name-and-measure` }>
-              {receita[tipo][0][elemento]}
-              {' '}
-              {receita[tipo][0][`strMeasure${index + 1}`]}
+        <section className="recipeMealDrink">
+          <div className="recipe-btn">
+            <button
+              className="recipe-btns"
+              onClick={ () => history.push('/meals') }
+            >
+              Voltar
+            </button>
+            <div className="interact-btn">
+              <FavoriteButton />
+              <ShareButton />
+            </div>
+          </div>
+          <div className="recipeImage">
+            <img
+              src={ receita[tipo][0].strMealThumb }
+              alt={ receita[tipo][0].strMeal }
+              data-testid="recipe-photo"
+            />
+          </div>
+          <div className="recipedetail">
+            <div className="recipe-info">
+              <h3
+                className="recipe-info-title"
+                data-testid="recipe-title"
+              >
+                {receita[tipo][0].strMeal}
+              </h3>
+              <p
+                data-testid="recipe-category"
+                className="recipe-info-title"
+              >
+                {receita[tipo][0].strCategory}
+              </p>
+              {ingredientes.map((elemento, index) => (
+                <p key={ index } data-testid={ `${index}-ingredient-name-and-measure` }>
+                  {receita[tipo][0][elemento]}
+                  {' '}
+                  {receita[tipo][0][`strMeasure${index + 1}`]}
+                </p>
+              ))}
+            </div>
+            <h4>Instructions</h4>
+            <p
+              className="recipeP"
+              data-testid="instructions"
+            >
+              {receita[tipo][0].strInstructions}
             </p>
-          ))}
-          <p data-testid="instructions">{receita[tipo][0].strInstructions}</p>
-          <iframe
-            data-testid="video"
-            width="560"
-            height="315"
-            src={ receita[tipo][0].strYoutube.replace('watch?v=', 'embed/') }
-            title="YouTube video player"
-            allow="accelerometer;
-                  clipboard-write;
-                  encrypted-media;
-                  gyroscope;
-                  picture-in-picture"
-            allowFullScreen
-          />
+            <div className="tutorial">
+              <h4>Tutorial</h4>
+              <iframe
+                data-testid="video"
+                className="video"
+                src={ receita[tipo][0].strYoutube.replace('watch?v=', 'embed/') }
+                title="YouTube video player"
+                allow="accelerometer;
+              clipboard-write;
+              encrypted-media;
+              gyroscope;
+              picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
         </section>
       ) : (
-        <section>
-          <img
-            src={ receita[tipo][0].strDrinkThumb }
-            alt={ receita[tipo][0].strDrink }
-            data-testid="recipe-photo"
-          />
-          <h3 data-testid="recipe-title">{receita[tipo][0].strDrink}</h3>
-          <p data-testid="recipe-category">{receita[tipo][0].strAlcoholic}</p>
-          {ingredientes.map((elemento, index) => (
-            <p key={ index } data-testid={ `${index}-ingredient-name-and-measure` }>
-              {receita[tipo][0][elemento]}
-              {' '}
-              {receita[tipo][0][`strMeasure${index + 1}`]}
+        <section className="recipeMealDrink">
+          <div className="recipe-btn">
+            <button
+              className="recipe-btns"
+              onClick={ () => history.push('/drinks') }
+            >
+              Voltar
+            </button>
+            <div className="interact-btn">
+              <ShareButton />
+              <FavoriteButton />
+            </div>
+          </div>
+          <div className="recipeImage">
+            <img
+              src={ receita[tipo][0].strDrinkThumb }
+              alt={ receita[tipo][0].strDrink }
+              data-testid="recipe-photo"
+            />
+          </div>
+          <div className="recipedetail">
+            <div className="recipe-info">
+              <h3
+                className="recipe-info-title"
+                data-testid="recipe-title"
+              >
+                {receita[tipo][0].strDrink}
+              </h3>
+              <p className="recipe-info-title" data-testid="recipe-category">
+                {receita[tipo][0].strAlcoholic}
+              </p>
+              {ingredientes.map((elemento, index) => (
+                <p key={ index } data-testid={ `${index}-ingredient-name-and-measure` }>
+                  {receita[tipo][0][elemento]}
+                  {' '}
+                  {receita[tipo][0][`strMeasure${index + 1}`]}
+                </p>
+              ))}
+            </div>
+            <h4>Instructions</h4>
+            <p className="recipeP" data-testid="instructions">
+              {receita[tipo][0].strInstructions}
+
             </p>
-          ))}
-          <p data-testid="instructions">{receita[tipo][0].strInstructions}</p>
+          </div>
         </section>
       )}
       <RecommendationCard />
@@ -172,7 +236,6 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
     </div>
   );
 }
-
 RecipeDetails.propTypes = {
   location: PropTypes.shape({
     pathname: PropTypes.string,
@@ -183,5 +246,4 @@ RecipeDetails.propTypes = {
     }),
   }),
 }.isRequired;
-
 export default RecipeDetails;

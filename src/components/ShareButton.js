@@ -21,6 +21,7 @@ function ShareButton() {
   return (
     <div>
       <button
+        className="recipe-btns"
         type="button"
         data-testid="share-btn"
         onClick={ copiarLink }
