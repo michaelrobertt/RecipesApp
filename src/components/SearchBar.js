@@ -113,60 +113,64 @@ function SearchBar() {
   };
 
   return (
-    <>
-      <div>SearchBar</div>
-      <input
-        type="text"
-        data-testid="search-input"
-        name="barraDePesquisa"
-        value={ refeicaoPesquisada }
-        onChange={ (e) => setRefeicaoPesquisada(e.target.value) }
-      />
-      <label htmlFor="ingrediente">
+    <div className="search">
+      <div className="pesquisa-search">
         <input
-          type="radio"
-          data-testid="ingredient-search-radio"
-          id="ingrediente"
-          name="ingrediente"
-          value="ingrediente"
-          checked={ tipoDePesquisa === 'ingrediente' }
-          onChange={ () => setTipoDePesquisa('ingrediente') }
+          type="text"
+          data-testid="search-input"
+          name="barraDePesquisa"
+          value={ refeicaoPesquisada }
+          onChange={ (e) => setRefeicaoPesquisada(e.target.value) }
+          placeholder="Search..."
         />
-        Ingrediente
-      </label>
-      <label htmlFor="nome">
-        <input
-          type="radio"
-          data-testid="name-search-radio"
-          id="nome"
-          name="nome"
-          value="nome"
-          checked={ tipoDePesquisa === 'nome' }
-          onChange={ () => setTipoDePesquisa('nome') }
-        />
-        Nome
-      </label>
-      <label htmlFor="primeiraLetra">
-        <input
-          type="radio"
-          data-testid="first-letter-search-radio"
-          id="primeiraLetra"
-          name="primeiraLetra"
-          value="primeiraLetra"
-          checked={ tipoDePesquisa === 'primeiraLetra' }
-          onChange={ () => setTipoDePesquisa('primeiraLetra') }
-        />
-        Primeira Letra
-      </label>
-      <button
-        type="button"
-        data-testid="exec-search-btn"
-        name="botaoDePesquisa"
-        onClick={ () => pesquisar() }
-      >
-        Pesquisar
-      </button>
-    </>
+        <button
+          type="button"
+          data-testid="exec-search-btn"
+          name="botaoDePesquisa"
+          onClick={ () => pesquisar() }
+        >
+          Pesquisar
+        </button>
+      </div>
+      <div className="pesquisa-filters">
+        <label htmlFor="ingrediente">
+          <input
+            type="radio"
+            data-testid="ingredient-search-radio"
+            id="ingrediente"
+            name="ingrediente"
+            value="ingrediente"
+            checked={ tipoDePesquisa === 'ingrediente' }
+            onChange={ () => setTipoDePesquisa('ingrediente') }
+          />
+          Ingrediente
+        </label>
+        <label htmlFor="nome">
+          <input
+            type="radio"
+            data-testid="name-search-radio"
+            id="nome"
+            name="nome"
+            value="nome"
+            checked={ tipoDePesquisa === 'nome' }
+            onChange={ () => setTipoDePesquisa('nome') }
+          />
+          Nome
+        </label>
+        <label htmlFor="primeiraLetra">
+          <input
+            type="radio"
+            data-testid="first-letter-search-radio"
+            id="primeiraLetra"
+            name="primeiraLetra"
+            value="primeiraLetra"
+            checked={ tipoDePesquisa === 'primeiraLetra' }
+            onChange={ () => setTipoDePesquisa('primeiraLetra') }
+          />
+          Primeira Letra
+        </label>
+      </div>
+    </div>
   );
 }
 
