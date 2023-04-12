@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import Copy from 'clipboard-copy';
 import shareIcon from '../images/shareIcon.svg';
 
 function ShareButton() {
   const { href } = window.location;
   const [copiado, setCopiado] = useState(false);
+  const location = useLocation();
 
   const copiarLink = () => {
+    if (location.pathname.includes('in-progress')) {
+      const link = href.split('/in-progress')[0];
+      Copy(link);
+      setCopiado(true);
+    }
     Copy(href);
     setCopiado(true);
   };
