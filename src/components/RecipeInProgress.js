@@ -4,16 +4,14 @@ import AppContext from '../context/AppContext';
 import ShareButton from './ShareButton';
 import FavoriteButton from './FavoriteButton';
 import '../App.css';
-import ShareButton from './ShareButton';
 
 function RecipeInProgress({ match: { params: { id } }, location: { pathname } }) {
   const { receita, setReceita } = useContext(AppContext);
   const [ingredientes, setingredientes] = useState(null);
   const [tipo, setTipo] = useState(null);
   const [carregando, setCarregando] = useState(true);
-  const [selectedIngredients, setSelectedIngredients] = useState(
-    JSON.parse(localStorage.getItem('inProgressRecipes')) || [],
-  );
+  const [ingredientesSelecionados, setIngredientesSelecionados] = useState([]);
+  const receitasEmProgresso = JSON.parse(localStorage.getItem('inProgressRecipes')) || [];
 
   useEffect(() => {
     const requisicaoDeReceita = async () => {
@@ -56,16 +54,25 @@ function RecipeInProgress({ match: { params: { id } }, location: { pathname } })
   const handleCheckboxChange = (event) => {
     const { value } = event.target;
 
-    if (selectedIngredients.includes(value)) {
-      setSelectedIngredients(selectedIngredients.filter((item) => item !== value));
+    if (ingredientesSelecionados.includes(value)) {
+      setIngredientesSelecionados(ingredientesSelecionados
+        .filter((item) => item !== value));
     } else {
-      setSelectedIngredients([...selectedIngredients, value]);
+      setIngredientesSelecionados([...ingredientesSelecionados, value]);
     }
   };
 
   useEffect(() => {
-    localStorage.setItem('inProgressRecipes', JSON.stringify(selectedIngredients));
-  }, [selectedIngredients]);
+    if (tipo === 'meals') {
+      localStorage.setItem('inProgressRecipes', JSON.stringify({ ...receitasEmProgresso,
+        meals: { ...receitasEmProgresso.meals,
+          [id]: ingredientesSelecionados } }));
+    } if (tipo === 'drinks') {
+      localStorage.setItem('inProgressRecipes', JSON.stringify({ ...receitasEmProgresso,
+        drinks: { ...receitasEmProgresso.drinks,
+          [id]: ingredientesSelecionados } }));
+    }
+  }, [ingredientesSelecionados]);
 
   if (carregando) { return <h1>Carregando...</h1>; }
   return (
@@ -85,7 +92,7 @@ function RecipeInProgress({ match: { params: { id } }, location: { pathname } })
           {ingredientes.map((elemento, index) => (
             <div key={ index }>
               <label
-                className={ selectedIngredients.includes(receita[tipo][0][elemento])
+                className={ ingredientesSelecionados.includes(receita[tipo][0][elemento])
                   ? 'strike' : '' }
                 htmlFor={ receita.meals.idMeal }
                 key={ index }
@@ -96,7 +103,8 @@ function RecipeInProgress({ match: { params: { id } }, location: { pathname } })
                   id={ receita.meals.idMeal }
                   name={ receita[tipo][0][elemento] }
                   value={ receita[tipo][0][elemento] }
-                  checked={ selectedIngredients.includes(receita[tipo][0][elemento]) }
+                  checked={ ingredientesSelecionados
+                    .includes(receita[tipo][0][elemento]) }
                   onChange={ handleCheckboxChange }
                 />
                 {receita[tipo][0][elemento]}
@@ -123,7 +131,7 @@ function RecipeInProgress({ match: { params: { id } }, location: { pathname } })
           {ingredientes.map((elemento, index) => (
             <div key={ index }>
               <label
-                className={ selectedIngredients.includes(receita[tipo][0][elemento])
+                className={ ingredientesSelecionados.includes(receita[tipo][0][elemento])
                   ? 'strike' : '' }
                 key={ index }
                 data-testid={ `${index}-ingredient-step` }
@@ -134,7 +142,8 @@ function RecipeInProgress({ match: { params: { id } }, location: { pathname } })
                   id={ receita.drinks.idDrinks }
                   name={ receita[tipo][0][elemento] }
                   value={ receita[tipo][0][elemento] }
-                  checked={ selectedIngredients.includes(receita[tipo][0][elemento]) }
+                  checked={ ingredientesSelecionados
+                    .includes(receita[tipo][0][elemento]) }
                   onChange={ handleCheckboxChange }
                 />
                 {receita[tipo][0][elemento]}
