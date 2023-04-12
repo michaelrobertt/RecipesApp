@@ -75,7 +75,7 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
         }
       });
     }
-  }, [receitasComecadas, tipo]);
+  }, [receitasComecadas]);
 
   const iniciarReceita = () => {
     history.push(`${pathname}/in-progress`);
@@ -86,6 +86,8 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
       setCarregando(false);
     }
   }, [ingredientes]);
+
+  console.log(receitasComecadas);
 
   if (carregando) { return <h1>Carregando...</h1>; }
   return (
