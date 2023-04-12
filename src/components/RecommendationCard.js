@@ -12,8 +12,6 @@ function RecommendationCard() {
     const seisRecomendacoes = () => {
       if (tipo) {
         if (tipo === 'drinks') {
-          console.log(recomendacoes);
-          console.log(tipo);
           const chave = 6;
           const recomendacoesDados = recomendacoes[tipo].slice(0, chave);
           setDados(recomendacoesDados);
@@ -27,7 +25,6 @@ function RecommendationCard() {
     seisRecomendacoes();
   }, []);
 
-  console.log(dados);
   return (
     <>
       <h1>Recomendações</h1>

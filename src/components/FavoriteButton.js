@@ -1,9 +1,27 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import AppContext from '../context/AppContext';
+import whiteHeartIcon from '../images/whiteHeartIcon.svg';
+import blackHeartIcon from '../images/blackHeartIcon.svg';
 
 function FavoriteButton() {
   const { receita } = useContext(AppContext);
   const favoritos = JSON.parse(localStorage.getItem('favoriteRecipes'));
+  const [receitaFavorita, setreceitaFavorita] = useState(false);
+
+  useEffect(() => {
+    if (receita !== undefined && favoritos) {
+      const tipoReceitas = Object.keys(receita).toString();
+      if (tipoReceitas === 'drinks') {
+        const id = receita.drinks[0].idDrink;
+        const estaFavoritado = favoritos.some((favRec) => favRec.id === id);
+        setreceitaFavorita(estaFavoritado);
+      } if (tipoReceitas === 'meals') {
+        const id = receita.meals[0].idMeal;
+        const estaFavoritado = favoritos.some((favRec) => favRec.id === id);
+        setreceitaFavorita(estaFavoritado);
+      }
+    }
+  }, []);
 
   const formatoReceitaData = () => {
     if (receita.meals) {
@@ -32,7 +50,7 @@ function FavoriteButton() {
   };
 
   const adicionarNoLocalStorage = (receitaData) => {
-    if (!favoritos) {
+    if (!receitaFavorita) {
       localStorage.setItem('favoriteRecipes', JSON.stringify([]));
     }
     const receitasFavoritas = JSON.parse(localStorage.getItem('favoriteRecipes'));
@@ -40,11 +58,21 @@ function FavoriteButton() {
     localStorage.setItem('favoriteRecipes', JSON.stringify(receitasFavoritas));
   };
 
+  const removeNoLocalStorage = (receitaData) => {
+    const receitasFavoritas = favoritos
+      .filter((favoritaReceita) => favoritaReceita.id !== receitaData.id);
+    localStorage.setItem('favoriteRecipes', JSON.stringify(receitasFavoritas));
+  };
+
   const atualizarLocalStorage = () => {
     const receitaData = formatoReceitaData();
-    if (receitaData) {
+    console.log(receitaFavorita);
+    if (!receitaFavorita) {
       adicionarNoLocalStorage(receitaData);
+    } if (receitaFavorita) {
+      removeNoLocalStorage(receitaData);
     }
+    setreceitaFavorita(!receitaFavorita);
   };
 
   return (
@@ -53,8 +81,12 @@ function FavoriteButton() {
         type="button"
         data-testid="favorite-btn"
         onClick={ atualizarLocalStorage }
+        src={ (receitaFavorita) ? blackHeartIcon : whiteHeartIcon }
       >
-        Favoritar
+        <img
+          alt="favorite-icon"
+          src={ (receitaFavorita) ? blackHeartIcon : whiteHeartIcon }
+        />
       </button>
 
     </div>
