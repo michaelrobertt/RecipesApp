@@ -147,15 +147,17 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
               <iframe
                 data-testid="video"
                 className="video"
-                src={ receita[tipo][0].strYoutube.replace('watch?v=', 'embed/') }
+                src={ receita[tipo][0].strYoutube ? receita[tipo][0]
+                  .strYoutube.replace('watch?v=', 'embed/') : '' }
                 title="YouTube video player"
                 allow="accelerometer;
-              clipboard-write;
-              encrypted-media;
-              gyroscope;
-              picture-in-picture"
+  clipboard-write;
+  encrypted-media;
+  gyroscope;
+  picture-in-picture"
                 allowFullScreen
               />
+
             </div>
           </div>
         </section>
