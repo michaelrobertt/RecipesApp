@@ -68,9 +68,7 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
 
   useEffect(() => {
     if (receitasComecadas && tipo) {
-      console.log(receitasComecadas);
-      console.log(tipo);
-      const idReceitasComecadas = Object.keys(receitasComecadas[tipo]);
+      const idReceitasComecadas = Object.keys(receitasComecadas[tipo] || {});
       idReceitasComecadas.forEach((item) => {
         if (item === id) {
           setReceitaEmAndamento(true);
@@ -210,30 +208,26 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
         </section>
       )}
       <RecommendationCard />
-      {!receitaCompleta ? (
-        <button
-          type="button"
-          data-testid="start-recipe-btn"
-          onClick={ iniciarReceita }
-          style={ {
-            position: 'fixed',
-            bottom: 0,
-          } }
-        >
-          Start Recipe
-        </button>) : null}
-      {receitaEmAndamento ? (
-        <button
-          type="button"
-          data-testid="start-recipe-btn"
-          onClick={ iniciarReceita }
-          style={ {
-            position: 'fixed',
-            bottom: 0,
-          } }
-        >
-          Continue Recipe
-        </button>) : null}
+      <div className="buttonRecipe">
+        {!receitaCompleta ? (
+          <button
+            type="button"
+            data-testid="start-recipe-btn"
+            onClick={ iniciarReceita }
+            className="receitaButton"
+          >
+            Start Recipe
+          </button>) : null}
+        {receitaEmAndamento ? (
+          <button
+            className="receitaButton"
+            type="button"
+            data-testid="start-recipe-btn"
+            onClick={ iniciarReceita }
+          >
+            Continue Recipe
+          </button>) : null}
+      </div>
     </div>
   );
 }

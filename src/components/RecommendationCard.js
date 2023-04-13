@@ -23,10 +23,11 @@ function RecommendationCard() {
       }
     };
     seisRecomendacoes();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <>
+    <div className="recomendacao">
       <h1>Recomendações</h1>
       {dados ? (
         <div className="container-recomendacao">
@@ -59,7 +60,7 @@ function RecommendationCard() {
               </section>)}
           </div>
         </div>) : null}
-    </>
+    </div>
   );
 }
 

@@ -469,6 +469,34 @@
   width: 100%;
 }
 
+.buttonRecipe {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.receitaButton {
+  background-color: rgb(255, 136, 0);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  height: 50px;
+  margin-bottom: 10px;
+  width: 80%;
+}
+
+.recomendacao {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
+.container-recomendacao {
+  width: 100%;
+}
+
 @keyframes shake {
 
   0% {
