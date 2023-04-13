@@ -25,6 +25,20 @@ function App() {
       <Route component={ Profile } exact path="/profile" />
       <Route component={ DoneRecipes } exact path="/done-recipes" />
       <Route component={ FavoriteRecipes } exact path="/favorite-recipes" />
+
+      <Route exact path="/meals/:id" component={ RecipeDetails } />
+      <Route exact path="/drinks/:id" component={ RecipeDetails } />
+
+      {/* <Route
+        exact
+        path="/meals/:id/in-progress"
+        component={ RecipeInProgress }
+      />
+      <Route
+        exact
+        path="/drinks/:id/in-progress"
+        component={ RecipeInProgress }
+      /> */}
     </Switch>
   );
 }
