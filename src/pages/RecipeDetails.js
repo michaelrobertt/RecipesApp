@@ -88,6 +88,7 @@ function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
     if (ingredientes) {
       setCarregando(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receitasComecadas, tipo]);
 
   if (carregando) { return <h1>Carregando...</h1>; }
