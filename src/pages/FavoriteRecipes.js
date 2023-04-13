@@ -43,24 +43,27 @@ function FavoriteRecipes() {
   return (
     <div>
       <Header pesquisaOff titulo="Favorite Recipes" />
-      <button
-        data-testid="filter-by-all-btn"
-        onClick={ () => setFiltro('all') }
-      >
-        All
-      </button>
-      <button
-        data-testid="filter-by-meal-btn"
-        onClick={ () => setFiltro('meal') }
-      >
-        Food
-      </button>
-      <button
-        data-testid="filter-by-drink-btn"
-        onClick={ () => setFiltro('drink') }
-      >
-        Drinks
-      </button>
+      <header className="donerecipebtn">
+
+        <button
+          data-testid="filter-by-all-btn"
+          onClick={ () => setFiltro('all') }
+        >
+          All
+        </button>
+        <button
+          data-testid="filter-by-meal-btn"
+          onClick={ () => setFiltro('meal') }
+        >
+          Food
+        </button>
+        <button
+          data-testid="filter-by-drink-btn"
+          onClick={ () => setFiltro('drink') }
+        >
+          Drinks
+        </button>
+      </header>
       {carregando ? (
         <p>Carregando...</p>
       ) : (
@@ -69,36 +72,50 @@ function FavoriteRecipes() {
       && receitasFiltradas.map((receita, index) => {
         if (receita.type === 'meal') {
           return (
-            <div key={ index }>
-              <Link to={ `/${receita.type}s/${receita.id}` }>
-                <img
-                  className="imgComida"
-                  src={ receita.image }
-                  alt="Imagem da receita favoritada"
-                  data-testid={ `${index}-horizontal-image` }
-                />
-                <p data-testid={ `${index}-horizontal-top-text` }>
-                  {`${receita.nationality} - ${receita.category}`}
-                </p>
-                <p data-testid={ `${index}-horizontal-name` }>
-                  {`${receita.name}`}
-                </p>
-              </Link>
-              <button
-                src={ shareIcon }
-                data-testid={ `${index}-horizontal-share-btn` }
-                onClick={ () => funcaoBotaoCompartilhar(receita.type, receita.id) }
-              >
-                <img src={ shareIcon } alt="Botão Compartilhar" />
-              </button>
-              <button
-                src={ blackHeartIcon }
-                data-testid={ `${index}-horizontal-favorite-btn` }
-                onClick={ () => funcaoBotaoDesfavoritar(receita.id) }
-              >
-                <img src={ blackHeartIcon } alt="Botão Desfavoritar" />
-              </button>
-              {linkCopiado ? (<p>Link copied!</p>) : ''}
+            <div key={ index } className="doneRecipes">
+              <div>
+                <Link to={ `/${receita.type}s/${receita.id}` }>
+                  <receitafav className="receitafavorite">
+                    <img
+                      className="favoriterecipeimg"
+                      src={ receita.image }
+                      alt="Imagem da receita favoritada"
+                      data-testid={ `${index}-horizontal-image` }
+                    />
+                    <p
+                      className="receitaLink"
+                      data-testid={ `${index}-horizontal-top-text` }
+                    >
+                      {`${receita.nationality} - ${receita.category}`}
+                    </p>
+                    <p
+                      className="receitaLink"
+                      data-testid={ `${index}-horizontal-name` }
+                    >
+                      {`${receita.name}`}
+                    </p>
+                  </receitafav>
+                </Link>
+                <div className="interact-btns">
+                  <button
+                    className="botaocss"
+                    src={ shareIcon }
+                    data-testid={ `${index}-horizontal-share-btn` }
+                    onClick={ () => funcaoBotaoCompartilhar(receita.type, receita.id) }
+                  >
+                    <img src={ shareIcon } alt="Botão Compartilhar" />
+                  </button>
+                  <button
+                    className="botaocss"
+                    src={ blackHeartIcon }
+                    data-testid={ `${index}-horizontal-favorite-btn` }
+                    onClick={ () => funcaoBotaoDesfavoritar(receita.id) }
+                  >
+                    <img src={ blackHeartIcon } alt="Botão Desfavoritar" />
+                  </button>
+                </div>
+                {linkCopiado ? (<p>Link copied!</p>) : ''}
+              </div>
             </div>
           );
         }

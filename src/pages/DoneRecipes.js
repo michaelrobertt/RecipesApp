@@ -57,31 +57,32 @@ function DoneRecipes() {
   return (
     <div>
       <Header pesquisaOff titulo="Done Recipes" />
-      <button
-        name="All"
-        onClick={ botaoBtnFiltro }
-        type="button"
-        data-testid="filter-by-all-btn"
-      >
-        All
-      </button>
-      <button
-        name="meal"
-        onClick={ botaoBtnFiltro }
-        type="button"
-        data-testid="filter-by-meal-btn"
-      >
-        Meals
-      </button>
-      <button
-        name="drink"
-        onClick={ botaoBtnFiltro }
-        type="button"
-        data-testid="filter-by-drink-btn"
-      >
-        Drinks
-      </button>
-
+      <header className="donerecipebtn">
+        <button
+          name="All"
+          onClick={ botaoBtnFiltro }
+          type="button"
+          data-testid="filter-by-all-btn"
+        >
+          All
+        </button>
+        <button
+          name="meal"
+          onClick={ botaoBtnFiltro }
+          type="button"
+          data-testid="filter-by-meal-btn"
+        >
+          Meals
+        </button>
+        <button
+          name="drink"
+          onClick={ botaoBtnFiltro }
+          type="button"
+          data-testid="filter-by-drink-btn"
+        >
+          Drinks
+        </button>
+      </header>
       {
         filtro.map((done, index) => {
           const {
@@ -95,11 +96,11 @@ function DoneRecipes() {
             type,
             doneDate,
           } = done;
-          console.log(typeof tags);
 
           return (
-            <div key={ done }>
+            <div className="doneRecipes" key={ done }>
               <img
+                className="donerecipeimg"
                 src={ image }
                 alt={ name }
                 data-testid={ `${index}-horizontal-image` }
@@ -126,6 +127,7 @@ function DoneRecipes() {
               <p data-testid={ `${index}-horizontal-done-date` }>{doneDate}</p>
 
               <button
+                className="botaodone"
                 src={ shareIcon }
                 onClick={ () => {
                   navigator.clipboard.writeText(`http://localhost:3000/${done.type}s/${done.id}`)
