@@ -1,3 +1,7 @@
+# RecEITA!
+
+![Application Description](https://github.com/michaelrobertt/RecipesApp/blob/main/Peek%202023-04-22%2009-21.gif?raw=true)
+
 # About
 
 Welcome to our full-featured front-end application, with a focus on mobile design!
