@@ -10,7 +10,7 @@ Welcome to our full-featured front-end application, with a focus on mobile desig
 
 Our goal was to create a recipes app that allows users to simulate a login and search for meals or cocktails recipes, with filters for ingredients, name, nationality, and more. Users can also mark a recipe as done and save it as a favorite, making it easy to access later.
 
-Developed with React.js functional components, using native and custom hooks, and with Redux for state management, our app was created with mobile use in mind, so we recommend using it on your mobile device for the best experience.
+Developed with React.js functional components, using native and custom hooks, and with Context API for state management, our app was created with mobile use in mind, so we recommend using it on your mobile device for the best experience.
 
 Click here to see the current state of the application.
 
