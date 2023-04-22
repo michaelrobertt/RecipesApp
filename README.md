@@ -12,7 +12,7 @@ Our goal was to create a recipes app that allows users to simulate a login and s
 
 Developed with React.js functional components, using native and custom hooks, and with Context API for state management, our app was created with mobile use in mind, so we recommend using it on your mobile device for the best experience.
 
-Click here to see the current state of the application.
+Click [here](https://receita.surge.sh) to see the current state of the application.
 
 ## Features
 
