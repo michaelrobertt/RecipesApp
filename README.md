@@ -1,7 +1,7 @@
 # RecEITA!
 
 <p align="center">
-  <img src="[APP IMAGE](https://github.com/michaelrobertt/RecipesApp/blob/main/Peek%202023-04-22%2009-21.gif?raw=true)" alt="Descrição da imagem">
+  <img src="https://github.com/michaelrobertt/RecipesApp/blob/main/Peek%202023-04-22%2009-21.gif?raw=true" alt="APP">
 </p>
 
 # About
