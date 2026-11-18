@@ -4,19 +4,15 @@ import './index.css';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import AppProvider from './context/AppProvider';
-import * as serviceWorker from './serviceWorker';
 
-ReactDOM
-  .createRoot(document.getElementById('root'))
-  .render(
+const root = document.getElementById('root');
+
+ReactDOM.createRoot(root).render(
+  <React.StrictMode>
     <BrowserRouter>
       <AppProvider>
         <App />
       </AppProvider>
-    </BrowserRouter>,
-  );
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+    </BrowserRouter>
+  </React.StrictMode>,
+);

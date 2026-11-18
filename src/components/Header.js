@@ -1,45 +1,66 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useHistory } from 'react-router-dom';
-import profileIcon from '../images/profileIcon.svg';
-import searchIcon from '../images/searchIcon.svg';
+import { Link } from 'react-router-dom';
 import SearchBar from './SearchBar';
+import { ArrowLeftIcon, CloseIcon, LogoMark, SearchIcon, UserIcon } from './icons';
 
-function Header({ titulo, pesquisaOff = false }) {
-  const history = useHistory();
-  const [mostrarBarraPesquisa, setMostrarBarraPesquisa] = useState(false);
+function Header({ title, onSearch = null, backTo = '', actions = null }) {
+  const [searchOpen, setSearchOpen] = useState(false);
+  const hasSearch = typeof onSearch === 'function';
+
+  const handleSearch = (params) => {
+    onSearch(params);
+  };
+
   return (
-    <div>
-      <main className="Header">
-        <h1 data-testid="page-title">{ titulo }</h1>
-        <div className="headerButton">
-          { !pesquisaOff && (
+    <header className="app-header">
+      <div className="app-header__bar">
+        {backTo ? (
+          <Link to={ backTo } className="icon-btn" aria-label="Go back">
+            <ArrowLeftIcon size={ 22 } />
+          </Link>
+        ) : (
+          <Link to="/meals" className="brand" aria-label="RecEITA! home">
+            <LogoMark size={ 30 } />
+            <span className="brand__word">RecEITA!</span>
+          </Link>
+        )}
+
+        <h1 className="app-header__title" data-testid="page-title">{title}</h1>
+
+        <div className="app-header__actions">
+          {actions}
+          {hasSearch ? (
             <button
               type="button"
-              onClick={ () => {
-                setMostrarBarraPesquisa(!mostrarBarraPesquisa);
-              } }
+              className="icon-btn"
+              aria-label={ searchOpen ? 'Close search' : 'Search recipes' }
+              aria-expanded={ searchOpen }
+              onClick={ () => setSearchOpen((open) => !open) }
             >
-              <img
-                data-testid="search-top-btn"
-                src={ searchIcon }
-                alt="Icone Pesquisa"
-              />
+              {searchOpen ? <CloseIcon size={ 22 } /> : <SearchIcon size={ 22 } />}
             </button>
-          ) }
-          <button type="button" onClick={ () => { history.push('/profile'); } }>
-            <img data-testid="profile-top-btn" src={ profileIcon } alt="Icone Perfil" />
-          </button>
+          ) : null}
+          <Link to="/profile" className="icon-btn" aria-label="Profile">
+            <UserIcon size={ 22 } />
+          </Link>
         </div>
-      </main>
-      {mostrarBarraPesquisa && <SearchBar />}
-    </div>
+      </div>
+
+      {hasSearch && searchOpen ? (
+        <div className="app-header__search">
+          <SearchBar onSubmit={ handleSearch } />
+        </div>
+      ) : null}
+    </header>
   );
 }
 
 Header.propTypes = {
-  titulo: PropTypes.string.isRequired,
-  pesquisaOff: PropTypes.bool,
+  title: PropTypes.string.isRequired,
+  onSearch: PropTypes.func,
+  backTo: PropTypes.string,
+  actions: PropTypes.node,
 };
 
 export default Header;

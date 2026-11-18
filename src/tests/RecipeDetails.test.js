@@ -1,134 +1,122 @@
-import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { act } from 'react-dom/test-utils';
-import renderWithRouter from './helpers/renderWithRouter';
-import AppProvider from '../context/AppProvider';
-import fetch from '../../cypress/mocks/fetch';
-import App from '../App';
+import { renderApp, setUpTest, screen, userEvent, waitFor } from './helpers/renderWithRouter';
 
-const startBtnTestId = 'start-recipe-btn';
-const pathnameDrink = '/drinks/15997';
-describe('Testa a pagina RecipesDetails', () => {
-  let history2;
-  beforeEach(async () => {
-    jest.spyOn(global, 'fetch');
-    global.fetch.mockImplementation(fetch);
+const user = userEvent.setup();
 
-    await act(async () => {
-      const { history } = renderWithRouter(
-        <AppProvider>
-          <App />
-        </AppProvider>,
-      );
-      history2 = history;
-    });
+const openMealDetail = async () => {
+  renderApp('/meals/52771');
+  await screen.findByTestId('recipe-title');
+};
+
+describe('Recipe details', () => {
+  setUpTest();
+
+  it('renders the recipe, its ingredients, instructions and video', async () => {
+    await openMealDetail();
+
+    expect(screen.getByTestId('recipe-title')).toHaveTextContent('Spicy Arrabiata Penne');
+    expect(screen.getByTestId('recipe-category')).toHaveTextContent('Italian · Vegetarian');
+    expect(screen.getByTestId('recipe-photo')).toHaveAttribute('src', expect.stringContaining('arrabiata'));
+    expect(screen.getByTestId('0-ingredient-name-and-measure')).toHaveTextContent('1 pound penne rigate');
+    expect(screen.getByTestId('3-ingredient-name-and-measure')).toHaveTextContent('2 cans chopped tomatoes');
+    expect(screen.getByTestId('instructions')).toHaveTextContent(/boil the pasta/i);
+    expect(screen.getByTestId('video')).toHaveAttribute(
+      'src',
+      'https://www.youtube-nocookie.com/embed/1IszT_guI08',
+    );
   });
-  it('Testa se ao clicar em uma imagem em meals é redirecionado pra pagina de detalhes correspondente.', async () => {
-    act(() => {
-      history2.push('/meals');
-    });
 
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(2);
-    });
+  it('loads six recommendations from the other API', async () => {
+    await openMealDetail();
 
-    const fotoComida = screen.getByTestId('0-card-img');
-    userEvent.click(fotoComida);
-
-    const { pathname } = history2.location;
-    expect(pathname).toBe('/meals/52977');
-
-    await waitFor(() => {
-      const comida = screen.getByText(/arrabiata/i);
-      expect(comida).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getAllByTestId(/-recommendation-card$/)).toHaveLength(6));
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('thecocktaildb.com'),
+    );
   });
-  it('Testa se ao clicar em uma imagem em drinks é redirecionado pra pagina de detalhes correspondente.', async () => {
-    act(() => {
-      history2.push('/drinks');
-    });
 
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(2);
-    });
+  it('toggles the recipe in and out of the favourites', async () => {
+    await openMealDetail();
+    const favourite = screen.getByTestId('favorite-btn');
 
-    const fotoBebida = screen.getByTestId('0-card-img');
-    userEvent.click(fotoBebida);
+    expect(favourite).toHaveAttribute('aria-pressed', 'false');
+    await user.click(favourite);
 
-    const { pathname } = history2.location;
-    expect(pathname).toBe(pathnameDrink);
+    expect(favourite).toHaveAttribute('aria-pressed', 'true');
+    expect(JSON.parse(localStorage.getItem('favoriteRecipes'))).toEqual([
+      expect.objectContaining({
+        id: '52771',
+        type: 'meal',
+        name: 'Spicy Arrabiata Penne',
+        nationality: 'Italian',
+        category: 'Vegetarian',
+      }),
+    ]);
 
-    await waitFor(() => {
-      const bebida = screen.getAllByText(/gg/i);
-      expect(bebida[0]).toBeInTheDocument();
-    });
+    await user.click(favourite);
+    expect(JSON.parse(localStorage.getItem('favoriteRecipes'))).toEqual([]);
   });
-  it('Testa se ao clicar no botão Start Recipe é direcionado para rota /in-progress', async () => {
-    act(() => {
-      history2.push('/drinks/15997');
-    });
 
-    await waitFor(() => {
-      expect(screen.getByText(/start recipe/i)).toBeInTheDocument();
-    });
+  it('copies a shareable link to the clipboard', async () => {
+    const writeText = jest.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
+    await openMealDetail();
 
-    const startRecipeBtn = screen.getByTestId(startBtnTestId);
-    userEvent.click(startRecipeBtn);
+    await user.click(screen.getByTestId('share-btn'));
 
-    const { pathname } = history2.location;
-    expect(pathname).toBe('/drinks/15997/in-progress');
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith(
+      expect.stringContaining('/meals/52771'),
+    ));
+    expect(await screen.findByRole('status')).toHaveTextContent(/link copied/i);
   });
-  it('Testa o botão Continue Recipe é renderizado quando a receita esta em progresso', async () => {
-    const inProgressRecipes = {
-      drinks: {
-        15997: [
-          'Galliano',
-        ],
-        17222: [
-          'Gin',
-          'Grand Marnier',
-        ],
-      },
-    };
 
-    localStorage.setItem('inProgressRecipes', JSON.stringify(inProgressRecipes));
+  it('starts the cooking flow', async () => {
+    const { history } = renderApp('/meals/52771');
+    await screen.findByTestId('recipe-title');
 
-    act(() => {
-      history2.push(pathnameDrink);
-    });
+    await user.click(screen.getByTestId('start-recipe-btn'));
 
-    await waitFor(() => {
-      const continueRecipeBtn = screen.getAllByTestId(startBtnTestId);
-      expect(continueRecipeBtn[1]).toBeInTheDocument();
-    });
-    const continueRecipeBtn = screen.getByRole('button', { name: /continue recipe/i });
-    userEvent.click(continueRecipeBtn);
-
-    const { pathname } = history2.location;
-    expect(pathname).toBe('/drinks/15997/in-progress');
+    await waitFor(() => expect(history.location.pathname).toBe('/meals/52771/in-progress'));
   });
-  it('Testa se quando a receita é finalizada os botões Start Recipe e Continue Recipe não são renderizados', async () => {
-    const doneRecipes = [
-      {
-        id: '52977',
-        type: 'meals',
-        nationality: 'Turkish',
-        category: 'Side',
-        alcoholicOrNot: '',
-        name: 'Corba',
-        image: 'https://www.themealdb.com/images/media/meals/58oia61564916529.jpg',
-        doneDate: '13/04/2023',
-        tags: [
-          'Soup',
-        ],
-      },
-    ];
 
-    localStorage.setItem('doneRecipes', JSON.stringify(doneRecipes));
+  it('offers to continue a recipe that is already in progress', async () => {
+    localStorage.setItem(
+      'inProgressRecipes',
+      JSON.stringify({ meals: { 52771: ['garlic'] }, drinks: {} }),
+    );
+    await openMealDetail();
 
-    act(() => {
-      history2.push('/meals/52977');
-    });
+    expect(screen.getByTestId('start-recipe-btn')).toHaveTextContent('Continue recipe');
+    expect(screen.getByText(/1 of 4/)).toBeInTheDocument();
+  });
+
+  it('hides the start button once the recipe is completed', async () => {
+    localStorage.setItem('doneRecipes', JSON.stringify([{
+      id: '52771',
+      type: 'meal',
+      name: 'Spicy Arrabiata Penne',
+      image: 'https://cdn.test/arrabiata.jpg',
+      category: 'Vegetarian',
+      nationality: 'Italian',
+      doneDate: '2024-04-13T10:00:00.000Z',
+      tags: ['Pasta'],
+    }]));
+    await openMealDetail();
+
+    expect(screen.getByTestId('recipe-completed')).toBeInTheDocument();
+    expect(screen.queryByTestId('start-recipe-btn')).not.toBeInTheDocument();
+  });
+
+  it('shows a friendly message when the recipe does not exist', async () => {
+    renderApp('/meals/999999');
+
+    expect(await screen.findByRole('heading', { name: /recipe not found/i }))
+      .toBeInTheDocument();
+  });
+
+  it('renders drinks with their alcohol label', async () => {
+    renderApp('/drinks/15997');
+
+    expect(await screen.findByTestId('recipe-title')).toHaveTextContent('GG');
+    expect(screen.getByTestId('recipe-category')).toHaveTextContent('Optional alcohol · Ordinary Drink');
+    expect(screen.getByTestId('1-ingredient-name-and-measure')).toHaveTextContent('Ginger ale');
   });
 });

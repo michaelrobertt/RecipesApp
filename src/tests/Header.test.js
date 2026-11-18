@@ -1,57 +1,37 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
 import userEvent from '@testing-library/user-event';
 import renderWithRouter from './helpers/renderWithRouter';
-import App from '../App';
+import Header from '../components/Header';
 
-describe('Teste do Header', () => {
-  test('1 - Verifica se é renderizado corretamente', async () => {
-    const { history } = renderWithRouter(<App />);
-    act(() => {
-      history.push('/drinks');
-    });
+const user = userEvent.setup();
 
-    expect(history.location.pathname).toBe('/drinks');
+describe('Header', () => {
+  it('shows the page title and the profile link', () => {
+    renderWithRouter(<Header title="Meals" />, { withProvider: false });
 
-    expect(screen.getByText('Drinks')).toBeInTheDocument();
-
-    const profileBTN = screen.getByTestId('profile-top-btn');
-    expect(profileBTN).toBeInTheDocument();
-    const searchBTN = screen.getByTestId('search-top-btn');
-    expect(searchBTN).toBeInTheDocument();
+    expect(screen.getByTestId('page-title')).toHaveTextContent('Meals');
+    expect(screen.getByRole('link', { name: 'Profile' })).toHaveAttribute('href', '/profile');
+    expect(screen.queryByRole('button', { name: /search recipes/i })).not.toBeInTheDocument();
   });
 
-  test('2 - Verifica se ele redirenciona para a pagina de perfil corretamente', async () => {
-    const { history } = renderWithRouter(<App />);
-    act(() => {
-      history.push('/drinks');
-    });
+  it('renders a back link instead of the brand when a destination is given', () => {
+    renderWithRouter(<Header title="Recipe" backTo="/drinks" />, { withProvider: false });
 
-    expect(history.location.pathname).toBe('/drinks');
-
-    const profileBTN = screen.getByTestId('profile-top-btn');
-    expect(profileBTN).toBeInTheDocument();
-
-    userEvent.click(profileBTN);
-
-    expect(history.location.pathname).toBe('/profile');
+    expect(screen.getByRole('link', { name: /go back/i })).toHaveAttribute('href', '/drinks');
   });
 
-  test('3 - Verifica se ele abre barra de busca', async () => {
-    const { history } = renderWithRouter(<App />);
-    act(() => {
-      history.push('/drinks');
-    });
+  it('opens the search panel only when a search handler exists', async () => {
+    const onSearch = jest.fn();
+    renderWithRouter(<Header title="Meals" onSearch={ onSearch } />, { withProvider: false });
 
-    expect(history.location.pathname).toBe('/drinks');
+    await user.click(screen.getByRole('button', { name: /search recipes/i }));
+    expect(screen.getByTestId('search-input')).toBeInTheDocument();
 
-    const searchBTN = screen.getByTestId('search-top-btn');
-    expect(searchBTN).toBeInTheDocument();
+    await user.type(screen.getByTestId('search-input'), 'chicken');
+    await user.click(screen.getByRole('radio', { name: 'Name' }));
+    await user.click(screen.getByTestId('exec-search-btn'));
 
-    userEvent.click(searchBTN);
-
-    const inputSearch = screen.getByTestId('search-input');
-    expect(inputSearch).toBeInTheDocument();
+    expect(onSearch).toHaveBeenCalledWith({ mode: 'name', query: 'chicken' });
   });
 });

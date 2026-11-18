@@ -1,246 +1,196 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
-import RecommendationCard from '../components/RecommendationCard';
-import AppContext from '../context/AppContext';
-import ShareButton from '../components/ShareButton';
+import Header from '../components/Header';
 import FavoriteButton from '../components/FavoriteButton';
+import ShareButton from '../components/ShareButton';
+import RecommendationCard from '../components/RecommendationCard';
+import Instructions from '../components/Instructions';
+import { EmptyState, ErrorState } from '../components/Feedback';
+import { BadgeCheckIcon, ClockIcon } from '../components/icons';
+import AppContext from '../context/AppContext';
+import { STATUS, useRecipe, useRecommendations } from '../hooks/useRecipes';
+import { formatDoneDate, formatIngredient, youtubeEmbedUrl } from '../utils/format';
+import { typeToPath } from '../utils/library';
 
-function RecipeDetails({ match: { params: { id } }, location: { pathname } }) {
-  const { setRecomendacoes, receita, setReceita } = useContext(AppContext);
+function RecipeDetails({ match }) {
+  const { id } = match.params;
+  const type = match.path.includes('drinks') ? 'drink' : 'meal';
+  const { isDone, doneRecipes, getProgress } = useContext(AppContext);
   const history = useHistory();
-  const [ingredientes, setingredientes] = useState(null);
-  const [tipo, setTipo] = useState(null);
-  const [carregando, setCarregando] = useState(true);
-  const [receitaCompleta, setReceitaCompleta] = useState(false);
-  const [receitaEmAndamento, setReceitaEmAndamento] = useState(false);
-  const receitasProntas = JSON.parse(localStorage.getItem('doneRecipes'));
-  const receitasComecadas = JSON.parse(localStorage.getItem('inProgressRecipes'));
+  const { status, recipe, error, reload } = useRecipe(type, id);
+  const recommendations = useRecommendations(type);
 
-  useEffect(() => {
-    const requisicaoDeReceita = async () => {
-      if (pathname.includes('drinks')) {
-        const requisicao = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${id}`);
-        const dados = await requisicao.json();
-        const requisicaoRecomendacoes = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=');
-        const dadosRecomendacoes = await requisicaoRecomendacoes.json();
-        setReceita(dados);
-        setRecomendacoes(dadosRecomendacoes);
-      } else {
-        const requisicao = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
-        const dados = await requisicao.json();
-        const requisicaoRecomendacoes = await fetch('https://www.thecocktaildb.com/api/json/v1/1/search.php?s=');
-        const dadosRecomendacoes = await requisicaoRecomendacoes.json();
-        setReceita(dados);
-        setRecomendacoes(dadosRecomendacoes);
-      }
-    };
-    requisicaoDeReceita();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const listPath = `/${typeToPath(type)}`;
+  const progress = getProgress(type, id);
+  const done = doneRecipes.find((item) => item.id === String(id));
 
-  useEffect(() => {
-    if (receita) {
-      const chaveIngredientes = Object.keys(receita).toString();
-      const chave = Object.keys(receita[chaveIngredientes][0]);
-      const todosIngredientes = [];
-      chave.forEach((element) => {
-        if (element.includes('strIngredient')
-        && receita[chaveIngredientes][0][element]) {
-          todosIngredientes.push(element);
-        }
-        setingredientes(todosIngredientes);
-        setTipo(chaveIngredientes);
-      });
-    }
-  }, [receita]);
+  if (status === STATUS.LOADING) {
+    return (
+      <div className="page">
+        <Header title="Recipe" backTo={ listPath } />
+        <main className="page__content">
+          <div className="details-skeleton">
+            <div className="skeleton details-skeleton__hero" />
+            <div className="skeleton skeleton-line skeleton-line--wide" />
+            <div className="skeleton skeleton-line" />
+            <div className="skeleton skeleton-line" />
+          </div>
+        </main>
+      </div>
+    );
+  }
 
-  useEffect(() => {
-    if (receitasProntas) {
-      receitasProntas.forEach((item) => {
-        if (item.id === id) {
-          setReceitaCompleta(true);
-        }
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receitasProntas]);
+  if (status === STATUS.ERROR) {
+    const notFound = error === 'Recipe not found';
+    return (
+      <div className="page">
+        <Header title="Recipe" backTo={ listPath } />
+        <main className="page__content">
+          {notFound ? (
+            <EmptyState
+              title="Recipe not found"
+              message="The recipe you are looking for does not exist or was removed."
+            >
+              <button
+                type="button"
+                className="btn btn--primary"
+                onClick={ () => history.push(listPath) }
+              >
+                Browse recipes
+              </button>
+            </EmptyState>
+          ) : (
+            <ErrorState message={ error } onRetry={ reload } />
+          )}
+        </main>
+      </div>
+    );
+  }
 
-  useEffect(() => {
-    if (receitasComecadas && tipo) {
-      const idReceitasComecadas = Object.keys(receitasComecadas[tipo] || {});
-      idReceitasComecadas.forEach((item) => {
-        if (item === id) {
-          setReceitaEmAndamento(true);
-        }
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receitasComecadas, tipo]);
+  const ctaLabel = progress.length > 0 ? 'Continue recipe' : 'Start recipe';
 
-  const iniciarReceita = () => {
-    history.push(`${pathname}/in-progress`);
-  };
-
-  useEffect(() => {
-    if (ingredientes) {
-      setCarregando(false);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receitasComecadas, tipo]);
-
-  if (carregando) { return <h1>Carregando...</h1>; }
   return (
-    <div>
-      {!pathname.includes('drinks') ? (
-        <section className="recipeMealDrink">
-          <div className="recipe-btn">
-            <button
-              className="recipe-btns"
-              onClick={ () => history.push('/meals') }
-            >
-              Voltar
-            </button>
-            <div className="interact-btn">
-              <FavoriteButton />
-              <ShareButton />
-            </div>
-          </div>
-          <div className="recipeImage">
-            <img
-              src={ receita[tipo][0].strMealThumb }
-              alt={ receita[tipo][0].strMeal }
-              data-testid="recipe-photo"
-            />
-          </div>
-          <div className="recipedetail">
-            <div className="recipe-info">
-              <h3
-                className="recipe-info-title"
-                data-testid="recipe-title"
-              >
-                {receita[tipo][0].strMeal}
-              </h3>
-              <p
-                data-testid="recipe-category"
-                className="recipe-info-title"
-              >
-                {receita[tipo][0].strCategory}
-              </p>
-              {ingredientes.map((elemento, index) => (
-                <p key={ index } data-testid={ `${index}-ingredient-name-and-measure` }>
-                  {receita[tipo][0][elemento]}
-                  {' '}
-                  {receita[tipo][0][`strMeasure${index + 1}`]}
-                </p>
-              ))}
-            </div>
-            <h4>Instructions</h4>
-            <p
-              className="recipeP"
-              data-testid="instructions"
-            >
-              {receita[tipo][0].strInstructions}
-            </p>
-            <div className="tutorial">
-              <h4>Tutorial</h4>
-              <iframe
-                data-testid="video"
-                className="video"
-                src={ receita[tipo][0].strYoutube ? receita[tipo][0]
-                  .strYoutube.replace('watch?v=', 'embed/') : '' }
-                title="YouTube video player"
-                allow="accelerometer;
-  clipboard-write;
-  encrypted-media;
-  gyroscope;
-  picture-in-picture"
-                allowFullScreen
-              />
+    <div className="page">
+      <Header
+        title={ recipe.name }
+        backTo={ listPath }
+        actions={ (
+          <>
+            <ShareButton type={ recipe.type } id={ recipe.id } />
+            <FavoriteButton recipe={ recipe } />
+          </>
+        ) }
+      />
 
-            </div>
-          </div>
-        </section>
-      ) : (
-        <section className="recipeMealDrink">
-          <div className="recipe-btn">
-            <button
-              className="recipe-btns"
-              onClick={ () => history.push('/drinks') }
-            >
-              Voltar
-            </button>
-            <div className="interact-btn">
-              <ShareButton />
-              <FavoriteButton />
-            </div>
-          </div>
-          <div className="recipeImage">
-            <img
-              src={ receita[tipo][0].strDrinkThumb }
-              alt={ receita[tipo][0].strDrink }
-              data-testid="recipe-photo"
-            />
-          </div>
-          <div className="recipedetail">
-            <div className="recipe-info">
-              <h3
-                className="recipe-info-title"
-                data-testid="recipe-title"
-              >
-                {receita[tipo][0].strDrink}
-              </h3>
-              <p className="recipe-info-title" data-testid="recipe-category">
-                {receita[tipo][0].strAlcoholic}
-              </p>
-              {ingredientes.map((elemento, index) => (
-                <p key={ index } data-testid={ `${index}-ingredient-name-and-measure` }>
-                  {receita[tipo][0][elemento]}
-                  {' '}
-                  {receita[tipo][0][`strMeasure${index + 1}`]}
-                </p>
-              ))}
-            </div>
-            <h4>Instructions</h4>
-            <p className="recipeP" data-testid="instructions">
-              {receita[tipo][0].strInstructions}
-
+      <main className="page__content page__content--detail">
+        <figure className="hero">
+          <img src={ recipe.image } alt={ recipe.name } data-testid="recipe-photo" />
+          <figcaption className="hero__caption">
+            <h2 className="hero__title" data-testid="recipe-title">{recipe.name}</h2>
+            <p className="hero__meta" data-testid="recipe-category">
+              {type === 'meal'
+                ? [recipe.area, recipe.category].filter(Boolean).join(' · ')
+                : [recipe.alcoholic, recipe.category].filter(Boolean).join(' · ')}
             </p>
+          </figcaption>
+        </figure>
+
+        {done ? (
+          <p className="completed-banner" data-testid="recipe-completed">
+            <BadgeCheckIcon size={ 20 } />
+            You cooked this on
+            {' '}
+            {formatDoneDate(done.doneDate)}
+          </p>
+        ) : null}
+
+        <div className="detail-columns">
+          <section className="card ingredients" aria-labelledby="ingredients-title">
+            <h2 id="ingredients-title" className="section-title">
+              Ingredients
+              <span className="count-badge">{recipe.ingredients.length}</span>
+            </h2>
+            <ul className="ingredient-list">
+              {recipe.ingredients.map((ingredient, index) => (
+                <li key={ ingredient.name } data-testid={ `${index}-ingredient-name-and-measure` }>
+                  <span className="ingredient-list__dot" />
+                  <span>{formatIngredient(ingredient)}</span>
+                </li>
+              ))}
+            </ul>
+            {progress.length > 0 ? (
+              <p className="ingredients__progress">
+                <ClockIcon size={ 16 } />
+                {progress.length}
+                {' of '}
+                {recipe.ingredients.length}
+                {' '}
+                ingredients ticked off
+              </p>
+            ) : null}
+          </section>
+
+          <div className="detail-main">
+            <section aria-labelledby="instructions-title">
+              <h2 id="instructions-title" className="section-title">Instructions</h2>
+              <Instructions text={ recipe.instructions } />
+            </section>
+
+            {recipe.tags.length > 0 ? (
+              <ul className="tag-list" aria-label="Tags">
+                {recipe.tags.map((tag) => <li key={ tag } className="tag">{tag}</li>)}
+              </ul>
+            ) : null}
+
+            {recipe.youtubeId ? (
+              <section className="video-block" aria-labelledby="video-title">
+                <h2 id="video-title" className="section-title">Watch how it is made</h2>
+                <div className="video-block__frame">
+                  <iframe
+                    data-testid="video"
+                    title={ `${recipe.name} video` }
+                    src={ youtubeEmbedUrl(recipe.youtubeId) }
+                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </div>
+              </section>
+            ) : null}
           </div>
-        </section>
-      )}
-      <RecommendationCard />
-      <div className="buttonRecipe">
-        {!receitaCompleta ? (
+        </div>
+
+        <RecommendationCard recipes={ recommendations } />
+      </main>
+
+      <div className="cta-bar">
+        {isDone(id) ? (
+          <p className="cta-bar__done">
+            <BadgeCheckIcon size={ 20 } />
+            Recipe completed
+          </p>
+        ) : (
           <button
             type="button"
+            className="btn btn--primary btn--block"
             data-testid="start-recipe-btn"
-            onClick={ iniciarReceita }
-            className="receitaButton"
+            onClick={ () => history.push(`${match.url}/in-progress`) }
           >
-            Start Recipe
-          </button>) : null}
-        {receitaEmAndamento ? (
-          <button
-            className="receitaButton"
-            type="button"
-            data-testid="start-recipe-btn"
-            onClick={ iniciarReceita }
-          >
-            Continue Recipe
-          </button>) : null}
+            {ctaLabel}
+          </button>
+        )}
       </div>
     </div>
   );
 }
+
 RecipeDetails.propTypes = {
-  location: PropTypes.shape({
-    pathname: PropTypes.string,
-  }),
   match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string,
-    }),
-  }),
-}.isRequired;
+    url: PropTypes.string.isRequired,
+    path: PropTypes.string.isRequired,
+    params: PropTypes.shape({ id: PropTypes.string.isRequired }).isRequired,
+  }).isRequired,
+};
+
 export default RecipeDetails;

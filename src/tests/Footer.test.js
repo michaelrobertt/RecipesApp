@@ -1,42 +1,25 @@
-import React from 'react';
-import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import renderWithRouter from './helpers/renderWithRouter';
-import Footer from '../components/Footer';
+import { renderApp, setUpTest, screen } from './helpers/renderWithRouter';
 
-describe('Teste o componente Footer', () => {
-  it('Verifica se é renderizado corretamente', () => {
-    renderWithRouter(<Footer />);
+describe('Footer', () => {
+  setUpTest();
 
-    screen.logTestingPlaygroundURL();
-    const btnComidas = screen.getByTestId('meals-bottom-btn');
-    const btnBebidas = screen.getByTestId('drinks-bottom-btn');
+  it('links to the four main destinations', async () => {
+    renderApp('/meals');
+    await screen.findByTestId('0-recipe-card');
 
-    expect(btnComidas).toBeInTheDocument();
-    expect(btnBebidas).toBeInTheDocument();
+    const footer = screen.getByTestId('footer');
+    expect(footer).toBeInTheDocument();
+    expect(screen.getByTestId('meals-bottom-btn')).toHaveAttribute('href', '/meals');
+    expect(screen.getByTestId('drinks-bottom-btn')).toHaveAttribute('href', '/drinks');
+    expect(screen.getByTestId('favorites-bottom-btn')).toHaveAttribute('href', '/favorite-recipes');
+    expect(screen.getByTestId('done-bottom-btn')).toHaveAttribute('href', '/done-recipes');
   });
 
-  it('Verifica se vou para rota "/meals" se clicar no botão de comidas', () => {
-    const { history } = renderWithRouter(<Footer />);
+  it('marks the current section as active', async () => {
+    renderApp('/drinks');
+    await screen.findByTestId('0-recipe-card');
 
-    const btnComidas = screen.getByTestId('meals-bottom-btn');
-    expect(btnComidas).toBeInTheDocument();
-
-    userEvent.click(btnComidas);
-
-    const { pathname } = history.location;
-    expect(pathname).toBe('/meals');
-  });
-
-  it('Verifica se vou para rota "/drinks" se clicar no botão de bebidas', () => {
-    const { history } = renderWithRouter(<Footer />);
-
-    const btnBebidas = screen.getByTestId('drinks-bottom-btn');
-    expect(btnBebidas).toBeInTheDocument();
-
-    userEvent.click(btnBebidas);
-
-    const { pathname } = history.location;
-    expect(pathname).toBe('/drinks');
+    expect(screen.getByTestId('drinks-bottom-btn')).toHaveClass('app-footer__link--active');
+    expect(screen.getByTestId('meals-bottom-btn')).not.toHaveClass('app-footer__link--active');
   });
 });

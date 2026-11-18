@@ -1,33 +1,30 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
-import drinkIcon from '../images/drinkIcon.svg';
-import mealIcon from '../images/mealIcon.svg';
+import { NavLink } from 'react-router-dom';
+import { BadgeCheckIcon, DrinkIcon, HeartIcon, MealIcon } from './icons';
+
+const ITEMS = [
+  { to: '/meals', label: 'Meals', Icon: MealIcon, testId: 'meals-bottom-btn' },
+  { to: '/drinks', label: 'Drinks', Icon: DrinkIcon, testId: 'drinks-bottom-btn' },
+  { to: '/favorite-recipes', label: 'Saved', Icon: HeartIcon, testId: 'favorites-bottom-btn' },
+  { to: '/done-recipes', label: 'Done', Icon: BadgeCheckIcon, testId: 'done-bottom-btn' },
+];
 
 function Footer() {
-  const history = useHistory();
   return (
-    <footer className="footer" data-testid="footer">
-      <button
-        className="footer-btn"
-        src={ mealIcon }
-        type="button"
-        data-testid="meals-bottom-btn"
-        onClick={ () => { history.push('/meals'); } }
-      >
-        <img className="footer-img" src={ mealIcon } alt="página de comidas" />
-        <p className="footer-p">Foods</p>
-      </button>
-      <button
-        className="footer-btn"
-        src={ drinkIcon }
-        type="button"
-        data-testid="drinks-bottom-btn"
-        onClick={ () => { history.push('/drinks'); } }
-      >
-        <img className="footer-img" src={ drinkIcon } alt="página de bebidas" />
-        <p className="footer-p">Drinks</p>
-      </button>
-    </footer>
+    <nav className="app-footer" data-testid="footer" aria-label="Main navigation">
+      {ITEMS.map(({ to, label, Icon, testId }) => (
+        <NavLink
+          key={ to }
+          to={ to }
+          className="app-footer__link"
+          activeClassName="app-footer__link--active"
+          data-testid={ testId }
+        >
+          <Icon size={ 22 } />
+          <span>{label}</span>
+        </NavLink>
+      ))}
+    </nav>
   );
 }
 

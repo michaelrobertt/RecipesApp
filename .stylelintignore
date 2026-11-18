@@ -1,3 +1,2 @@
-src/index.css
-cypress/*
+build/*
 coverage/*

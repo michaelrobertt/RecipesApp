@@ -1,248 +1,185 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
+import Header from '../components/Header';
+import FavoriteButton from '../components/FavoriteButton';
+import ShareButton from '../components/ShareButton';
+import Instructions from '../components/Instructions';
+import { EmptyState, ErrorState } from '../components/Feedback';
+import { CheckIcon, ClockIcon } from '../components/icons';
 import AppContext from '../context/AppContext';
-import ShareButton from './ShareButton';
-import FavoriteButton from './FavoriteButton';
-import '../App.css';
+import { STATUS, useRecipe } from '../hooks/useRecipes';
+import { formatIngredient } from '../utils/format';
+import { typeToPath } from '../utils/library';
 
-function RecipeInProgress({ match: { params: { id } }, location: { pathname } }) {
-  const { receita, setReceita } = useContext(AppContext);
+function RecipeInProgress({ match }) {
+  const { id } = match.params;
+  const type = match.path.includes('drinks') ? 'drink' : 'meal';
+  const {
+    getProgress, updateProgress, clearProgress, addDoneRecipe,
+  } = useContext(AppContext);
   const history = useHistory();
-  const [ingredientes, setingredientes] = useState(null);
-  const [tipo, setTipo] = useState(null);
-  const [carregando, setCarregando] = useState(true);
-  const [ingredientesSelecionados, setIngredientesSelecionados] = useState([]);
-  const receitasEmProgresso = JSON.parse(localStorage.getItem('inProgressRecipes')) || [];
+  const { status, recipe, error, reload } = useRecipe(type, id);
 
-  useEffect(() => {
-    const requisicaoDeReceita = async () => {
-      if (pathname.includes('drinks')) {
-        const requisicao = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${id}`);
-        const dados = await requisicao.json();
-        setReceita(dados);
-      } else {
-        const requisicao = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
-        const dados = await requisicao.json();
-        setReceita(dados);
-      }
-    };
-    requisicaoDeReceita();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const checkedIngredients = getProgress(type, id);
 
-  useEffect(() => {
-    if (receita) {
-      const chaveIngredientes = Object.keys(receita).toString();
-      const chave = Object.keys(receita[chaveIngredientes][0]);
-      const todosIngredientes = [];
-      chave.forEach((element) => {
-        if (element.includes('strIngredient')
-        && receita[chaveIngredientes][0][element]) {
-          todosIngredientes.push(element);
-        }
-        setingredientes(todosIngredientes);
-        setTipo(chaveIngredientes);
-      });
-    }
-  }, [receita]);
+  const percent = useMemo(() => {
+    if (!recipe || recipe.ingredients.length === 0) return 0;
+    return Math.round((checkedIngredients.length / recipe.ingredients.length) * 100);
+  }, [checkedIngredients.length, recipe]);
 
-  useEffect(() => {
-    if (ingredientes) {
-      setCarregando(false);
-    }
-  }, [ingredientes]);
+  const listPath = `/${typeToPath(type)}`;
+  const allChecked = Boolean(recipe)
+    && recipe.ingredients.length > 0
+    && checkedIngredients.length === recipe.ingredients.length;
 
-  const handleCheckboxChange = (event) => {
-    const { value } = event.target;
-
-    if (ingredientesSelecionados.includes(value)) {
-      setIngredientesSelecionados(ingredientesSelecionados
-        .filter((item) => item !== value));
-    } else {
-      setIngredientesSelecionados([...ingredientesSelecionados, value]);
-    }
+  const toggleIngredient = (name) => {
+    const next = checkedIngredients.includes(name)
+      ? checkedIngredients.filter((item) => item !== name)
+      : [...checkedIngredients, name];
+    updateProgress(type, id, next);
   };
 
-  useEffect(() => {
-    if (tipo === 'meals') {
-      localStorage.setItem('inProgressRecipes', JSON.stringify({ ...receitasEmProgresso,
-        meals: { ...receitasEmProgresso.meals,
-          [id]: ingredientesSelecionados } }));
-    } if (tipo === 'drinks') {
-      localStorage.setItem('inProgressRecipes', JSON.stringify({ ...receitasEmProgresso,
-        drinks: { ...receitasEmProgresso.drinks,
-          [id]: ingredientesSelecionados } }));
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ingredientesSelecionados]);
+  const finishRecipe = () => {
+    if (!allChecked) return;
+    addDoneRecipe(recipe);
+    clearProgress(type, id);
+    history.push('/done-recipes');
+  };
 
-  if (carregando) { return <h1>Carregando...</h1>; }
+  if (status === STATUS.LOADING) {
+    return (
+      <div className="page">
+        <Header title="Cooking" backTo={ listPath } />
+        <main className="page__content">
+          <div className="skeleton skeleton-line skeleton-line--wide" />
+          <div className="skeleton skeleton-line" />
+          <div className="skeleton skeleton-line" />
+        </main>
+      </div>
+    );
+  }
+
+  if (status === STATUS.ERROR) {
+    return (
+      <div className="page">
+        <Header title="Cooking" backTo={ listPath } />
+        <main className="page__content">
+          {error === 'Recipe not found' ? (
+            <EmptyState title="Recipe not found" message="It may have been removed." />
+          ) : (
+            <ErrorState message={ error } onRetry={ reload } />
+          )}
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      {!pathname.includes('drinks') ? (
-        <section className="recipeMealDrink">
-          <div className="recipe-btn">
-            <button
-              className="recipe-btns"
-              onClick={ () => history.push('/meals') }
-            >
-              Voltar
-            </button>
-            <div className="interact-btn">
-              <FavoriteButton />
-              <ShareButton />
-            </div>
-          </div>
-          <div className="recipeImage">
-            <img
-              src={ receita[tipo][0].strMealThumb }
-              alt={ receita[tipo][0].strMeal }
-              data-testid="recipe-photo"
-            />
-          </div>
-          <div className="recipedetail">
-            <div className="recipe-info">
-              <h1
-                className="recipe-info-title"
-                data-testid="recipe-title"
-              >
-                {receita[tipo][0].strMeal}
+    <div className="page">
+      <Header
+        title={ recipe.name }
+        backTo={ `${listPath}/${recipe.id}` }
+        actions={ (
+          <>
+            <ShareButton type={ recipe.type } id={ recipe.id } />
+            <FavoriteButton recipe={ recipe } />
+          </>
+        ) }
+      />
 
-              </h1>
-              <p
-                className="recipe-info-title"
-                data-testid="recipe-category"
-              >
-                {receita[tipo][0].strCategory}
-              </p>
-              <h2>Ingredients</h2>
-              {ingredientes.map((elemento, index) => (
-                <div key={ index }>
-                  <label
-                    className={ ingredientesSelecionados
-                      .includes(receita[tipo][0][elemento])
-                      ? 'strike' : '' }
-                    htmlFor={ receita.meals.idMeal }
-                    key={ index }
-                    data-testid={ `${index}-ingredient-step` }
-                  >
-                    <input
-                      type="checkbox"
-                      id={ receita.meals.idMeal }
-                      name={ receita[tipo][0][elemento] }
-                      value={ receita[tipo][0][elemento] }
-                      checked={ ingredientesSelecionados
-                        .includes(receita[tipo][0][elemento]) }
-                      onChange={ handleCheckboxChange }
-                    />
-                    {receita[tipo][0][elemento]}
-                    {' '}
-                    {receita[tipo][0][`strMeasure${index + 1}`]}
-                  </label>
-                </div>
-              ))}
-            </div>
-            <h2>Instructions</h2>
-            <p
-              className="recipeP"
-              data-testid="instructions"
-            >
-              {receita[tipo][0].strInstructions}
+      <main className="page__content page__content--detail">
+        <div className="cooking-head">
+          <img className="cooking-head__thumb" src={ recipe.image } alt={ recipe.name } />
+          <div>
+            <h2 className="cooking-head__title" data-testid="recipe-title">{recipe.name}</h2>
+            <p className="cooking-head__meta" data-testid="recipe-category">
+              {type === 'meal' ? recipe.category : [recipe.alcoholic, recipe.category]
+                .filter(Boolean).join(' · ')}
             </p>
-            <div className="tutorial">
-              <h4>Tutorial</h4>
-              <iframe
-                data-testid="video"
-                className="video"
-                src={ receita[tipo][0].strYoutube.replace('watch?v=', 'embed/') }
-                title="YouTube video player"
-                allow="accelerometer;
-              clipboard-write;
-              encrypted-media;
-              gyroscope;
-              picture-in-picture"
-                allowFullScreen
-              />
-            </div>
           </div>
-        </section>
-      ) : (
-        <section className="recipeMealDrink">
-          <div className="recipe-btn">
-            <button
-              className="recipe-btns"
-              onClick={ () => history.push('/meals') }
-            >
-              Voltar
-            </button>
-            <div className="interact-btn">
-              <FavoriteButton />
-              <ShareButton />
-            </div>
+        </div>
+
+        <section className="card" aria-labelledby="progress-title">
+          <div className="progress-head">
+            <h2 id="progress-title" className="section-title">Your progress</h2>
+            <span className="progress-head__count">
+              {checkedIngredients.length}
+              /
+              {recipe.ingredients.length}
+            </span>
           </div>
-          <div className="recipeImage">
-            <img
-              src={ receita[tipo][0].strDrinkThumb }
-              alt={ receita[tipo][0].strDrink }
-              data-testid="recipe-photo"
-            />
+          <div
+            className="progress"
+            role="progressbar"
+            aria-valuenow={ percent }
+            aria-valuemin={ 0 }
+            aria-valuemax={ 100 }
+            aria-label="Ingredients ticked off"
+          >
+            <div className="progress__bar" style={ { width: `${percent}%` } } />
           </div>
-          <div className="recipedetail">
-            <div className="recipe-info">
-              <h1 data-testid="recipe-title">{receita[tipo][0].strDrink}</h1>
-              <p data-testid="recipe-category">{receita[tipo][0].strAlcoholic}</p>
-              <h2>Ingredients</h2>
-              {ingredientes.map((elemento, index) => (
-                <div key={ index }>
+
+          <ul className="checklist">
+            {recipe.ingredients.map((ingredient, index) => {
+              const checked = checkedIngredients.includes(ingredient.name);
+              const inputId = `ingredient-${index}`;
+              return (
+                <li key={ ingredient.name }>
                   <label
-                    className={ ingredientesSelecionados
-                      .includes(receita[tipo][0][elemento])
-                      ? 'strike' : '' }
-                    key={ index }
+                    className={ `checklist__item ${checked ? 'checklist__item--done' : ''}` }
+                    htmlFor={ inputId }
                     data-testid={ `${index}-ingredient-step` }
-                    htmlFor={ receita.drinks.idDrinks }
                   >
                     <input
+                      id={ inputId }
                       type="checkbox"
-                      id={ receita.drinks.idDrinks }
-                      name={ receita[tipo][0][elemento] }
-                      value={ receita[tipo][0][elemento] }
-                      checked={ ingredientesSelecionados
-                        .includes(receita[tipo][0][elemento]) }
-                      onChange={ handleCheckboxChange }
+                      checked={ checked }
+                      onChange={ () => toggleIngredient(ingredient.name) }
                     />
-                    {receita[tipo][0][elemento]}
-                    {' '}
-                    {receita[tipo][0][`strMeasure${index + 1}`]}
+                    <span className="checklist__box" aria-hidden="true">
+                      <CheckIcon size={ 14 } />
+                    </span>
+                    <span className="checklist__label">{formatIngredient(ingredient)}</span>
                   </label>
-                </div>
-              ))}
-            </div>
-            <h2>Instructions</h2>
-            <p data-testid="instructions">{receita[tipo][0].strInstructions}</p>
-          </div>
+                </li>
+              );
+            })}
+          </ul>
         </section>
-      )}
-      <div className="buttonRecipe">
+
+        <section aria-labelledby="steps-title">
+          <h2 id="steps-title" className="section-title">Instructions</h2>
+          <Instructions text={ recipe.instructions } />
+        </section>
+      </main>
+
+      <div className="cta-bar">
+        {!allChecked ? (
+          <p className="cta-bar__hint">
+            <ClockIcon size={ 16 } />
+            Tick every ingredient to finish the recipe
+          </p>
+        ) : null}
         <button
-          className="receitaButton"
+          type="button"
+          className="btn btn--primary btn--block"
           data-testid="finish-recipe-btn"
+          onClick={ finishRecipe }
+          disabled={ !allChecked }
         >
-          Finalizar Receita
+          Finish recipe
         </button>
       </div>
     </div>
   );
 }
+
 RecipeInProgress.propTypes = {
-  location: PropTypes.shape({
-    pathname: PropTypes.string,
-  }),
   match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string,
-    }),
-  }),
-}.isRequired;
+    path: PropTypes.string.isRequired,
+    params: PropTypes.shape({ id: PropTypes.string.isRequired }).isRequired,
+  }).isRequired,
+};
+
 export default RecipeInProgress;

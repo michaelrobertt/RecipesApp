@@ -1,98 +1,36 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
+import PropTypes from 'prop-types';
 import AppContext from '../context/AppContext';
-import whiteHeartIcon from '../images/whiteHeartIcon.svg';
-import blackHeartIcon from '../images/blackHeartIcon.svg';
+import { HeartIcon } from './icons';
 
-function FavoriteButton() {
-  const { receita } = useContext(AppContext);
-  const favoritos = JSON.parse(localStorage.getItem('favoriteRecipes'));
-  const [receitaFavorita, setreceitaFavorita] = useState(false);
-
-  useEffect(() => {
-    if (receita !== undefined && favoritos) {
-      const tipoReceitas = Object.keys(receita).toString();
-      if (tipoReceitas === 'drinks') {
-        const id = receita.drinks[0].idDrink;
-        const estaFavoritado = favoritos.some((favRec) => favRec.id === id);
-        setreceitaFavorita(estaFavoritado);
-      } if (tipoReceitas === 'meals') {
-        const id = receita.meals[0].idMeal;
-        const estaFavoritado = favoritos.some((favRec) => favRec.id === id);
-        setreceitaFavorita(estaFavoritado);
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const formatoReceitaData = () => {
-    if (receita.meals) {
-      const receitaData = {
-        id: receita.meals[0].idMeal,
-        type: 'meal',
-        nationality: receita.meals[0].strArea,
-        category: receita.meals[0].strCategory,
-        alcoholicOrNot: (receita.meals[0]
-          .strDrinkAlternate ? receita.meals[0].strDrinkAlternate : ''),
-        name: receita.meals[0].strMeal,
-        image: receita.meals[0].strMealThumb,
-      };
-      return receitaData;
-    }
-    const receitaData = {
-      id: receita.drinks[0].idDrink,
-      type: 'drink',
-      nationality: (receita.drinks[0].strArea ? receita.drinks[0].strArea : ''),
-      category: receita.drinks[0].strCategory,
-      alcoholicOrNot: receita.drinks[0].strAlcoholic,
-      name: receita.drinks[0].strDrink,
-      image: receita.drinks[0].strDrinkThumb,
-    };
-    return receitaData;
-  };
-
-  const adicionarNoLocalStorage = (receitaData) => {
-    if (!receitaFavorita) {
-      localStorage.setItem('favoriteRecipes', JSON.stringify([]));
-    }
-    const receitasFavoritas = JSON.parse(localStorage.getItem('favoriteRecipes'));
-    receitasFavoritas.push(receitaData);
-    localStorage.setItem('favoriteRecipes', JSON.stringify(receitasFavoritas));
-  };
-
-  const removeNoLocalStorage = (receitaData) => {
-    const receitasFavoritas = favoritos
-      .filter((favoritaReceita) => favoritaReceita.id !== receitaData.id);
-    localStorage.setItem('favoriteRecipes', JSON.stringify(receitasFavoritas));
-  };
-
-  const atualizarLocalStorage = () => {
-    const receitaData = formatoReceitaData();
-    console.log(receitaFavorita);
-    if (!receitaFavorita) {
-      adicionarNoLocalStorage(receitaData);
-    } if (receitaFavorita) {
-      removeNoLocalStorage(receitaData);
-    }
-    setreceitaFavorita(!receitaFavorita);
-  };
+function FavoriteButton({ recipe, withLabel = false }) {
+  const { isFavorite, toggleFavorite } = useContext(AppContext);
+  const saved = isFavorite(recipe.id);
 
   return (
-    <div>
-      <button
-        type="button"
-        data-testid="favorite-btn"
-        onClick={ atualizarLocalStorage }
-        className="recipe-btns"
-        src={ (receitaFavorita) ? blackHeartIcon : whiteHeartIcon }
-      >
-        <img
-          alt="favorite-icon"
-          src={ (receitaFavorita) ? blackHeartIcon : whiteHeartIcon }
-        />
-      </button>
-
-    </div>
+    <button
+      type="button"
+      className={ `icon-btn ${saved ? 'icon-btn--danger' : ''}` }
+      data-testid="favorite-btn"
+      onClick={ () => toggleFavorite(recipe) }
+      aria-pressed={ saved }
+      aria-label={ saved ? 'Remove from favourites' : 'Save to favourites' }
+      title={ saved ? 'Remove from favourites' : 'Save to favourites' }
+    >
+      <HeartIcon size={ 22 } filled={ saved } />
+      {withLabel ? <span>{saved ? 'Saved' : 'Save'}</span> : null}
+    </button>
   );
 }
+
+FavoriteButton.propTypes = {
+  recipe: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    name: PropTypes.string,
+    image: PropTypes.string,
+  }).isRequired,
+  withLabel: PropTypes.bool,
+};
 
 export default FavoriteButton;

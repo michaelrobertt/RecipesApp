@@ -1,117 +1,56 @@
-import React from 'react';
-import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { act } from 'react-dom/test-utils';
-import renderWithRouter from './helpers/renderWithRouter';
-import App from '../App';
-import AppProvider from '../context/AppProvider';
+import { renderApp, setUpTest, screen, signIn, userEvent, waitFor } from './helpers/renderWithRouter';
 
-// const emailInput = 'email-input';
-// const senhaInput = 'password-input';
+const user = userEvent.setup();
 
-describe('Testa a página de Profile', () => {
-  it('Testa se renderiza os elementos corretamente', () => {
-    const { history } = renderWithRouter(
-      <AppProvider>
-        <App />
-      </AppProvider>,
-    );
+const seed = () => {
+  signIn('chef@example.com');
+  localStorage.setItem('favoriteRecipes', JSON.stringify([{ id: '52771', type: 'meal', name: 'A' }]));
+  localStorage.setItem('doneRecipes', JSON.stringify([
+    { id: '52771', type: 'meal', name: 'A', doneDate: '2024-04-13T10:00:00.000Z' },
+    { id: '15997', type: 'drink', name: 'B', doneDate: '2024-04-14T10:00:00.000Z' },
+  ]));
+};
 
-    act(() => {
-      history.push('/profile');
-    });
+describe('Profile', () => {
+  setUpTest();
 
-    const titulo = screen.getByRole('heading', { name: /profile/i });
-    expect(titulo).toBeInTheDocument();
+  it('shows the signed in email and the library counters', () => {
+    seed();
+    renderApp('/profile');
 
-    const iconePerfil = screen.getByRole('img', { name: /icone perfil/i });
-    expect(iconePerfil).toBeInTheDocument();
-
-    const doneRecipesBtn = screen.getByRole('button', { name: /done recipes/i });
-    expect(doneRecipesBtn).toBeInTheDocument();
-
-    const favoriteRecipesBtn = screen.getByRole('button', { name: /favorite recipes/i });
-    expect(favoriteRecipesBtn).toBeInTheDocument();
-
-    const logoutBtn = screen.getByRole('button', { name: /logout/i });
-    expect(logoutBtn).toBeInTheDocument();
-
-    const paginaDeComidasLink = screen.getByRole('img', { name: /página de comidas/i });
-    expect(paginaDeComidasLink).toBeInTheDocument();
-
-    const paginaDeBebidasLink = screen.getByRole('img', { name: /página de bebidas/i });
-    expect(paginaDeBebidasLink).toBeInTheDocument();
-  });
-  it('Testa se o email logado é exibido corretamente', () => {
-    const { history } = renderWithRouter(<App />);
-
-    const email = screen.getByTestId('email-input');
-    const senha = screen.getByTestId('password-input');
-    const botao = screen.getByRole('button');
-
-    userEvent.type(email, 'email@email.com');
-    userEvent.type(senha, '1234567');
-    userEvent.click(botao);
-
-    const { pathname } = history.location;
-    expect(pathname).toBe('/meals');
-
-    const iconePerfil = screen.getByRole('img', { name: /icone perfil/i });
-    userEvent.click(iconePerfil);
-
-    const emailProfile = screen.getByRole('heading', { name: /email@email\.com/i });
-    expect(emailProfile).toBeInTheDocument();
+    expect(screen.getByTestId('page-title')).toHaveTextContent('Profile');
+    expect(screen.getByTestId('profile-email')).toHaveTextContent('chef@example.com');
+    expect(screen.getByTestId('profile-favorite-btn')).toHaveTextContent('1');
+    expect(screen.getByTestId('profile-done-btn')).toHaveTextContent('2');
   });
 
-  it('Testa o botão Done Recipes', () => {
-    const { history } = renderWithRouter(
-      <AppProvider>
-        <App />
-      </AppProvider>,
-    );
+  it('navigates to the saved recipes page', async () => {
+    seed();
+    const { history } = renderApp('/profile');
 
-    act(() => {
-      history.push('/profile');
-    });
+    await user.click(screen.getByTestId('profile-favorite-btn'));
 
-    const doneRecipesBtn = screen.getByRole('button', { name: /done recipes/i });
-    userEvent.click(doneRecipesBtn);
-
-    const { pathname } = history.location;
-    expect(pathname).toBe('/done-recipes');
+    await waitFor(() => expect(history.location.pathname).toBe('/favorite-recipes'));
   });
-  it('Testa o botão Favorite Recipes', () => {
-    const { history } = renderWithRouter(
-      <AppProvider>
-        <App />
-      </AppProvider>,
-    );
 
-    act(() => {
-      history.push('/profile');
-    });
+  it('navigates to the completed dishes page', async () => {
+    seed();
+    const { history } = renderApp('/profile');
 
-    const favoriteRecipesBtn = screen.getByRole('button', { name: /favorite recipes/i });
-    userEvent.click(favoriteRecipesBtn);
+    await user.click(screen.getByTestId('profile-done-btn'));
 
-    const { pathname } = history.location;
-    expect(pathname).toBe('/favorite-recipes');
+    await waitFor(() => expect(history.location.pathname).toBe('/done-recipes'));
   });
-  it('Testa o botão Logout', () => {
-    const { history } = renderWithRouter(
-      <AppProvider>
-        <App />
-      </AppProvider>,
-    );
 
-    act(() => {
-      history.push('/profile');
-    });
+  it('logs out without deleting the saved recipes', async () => {
+    seed();
+    const { history } = renderApp('/profile');
 
-    const logoutBtn = screen.getByRole('button', { name: /logout/i });
-    userEvent.click(logoutBtn);
+    await user.click(screen.getByTestId('profile-logout-btn'));
 
-    const { pathname } = history.location;
-    expect(pathname).toBe('/');
+    await waitFor(() => expect(history.location.pathname).toBe('/'));
+    expect(localStorage.getItem('user')).toBeNull();
+    expect(JSON.parse(localStorage.getItem('favoriteRecipes'))).toHaveLength(1);
+    expect(JSON.parse(localStorage.getItem('doneRecipes'))).toHaveLength(2);
   });
 });

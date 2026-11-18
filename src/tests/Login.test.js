@@ -1,54 +1,49 @@
-import React from 'react';
-import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import renderWithRouter from './helpers/renderWithRouter';
-import App from '../App';
+import { renderApp, setUpTest, screen, userEvent, waitFor } from './helpers/renderWithRouter';
 
-const emailInput = 'email-input';
-const senhaInput = 'password-input';
+const user = userEvent.setup();
 
-describe('Testa a página de Login', () => {
-  it('Testa se renderiza os elementos corretamente', () => {
-    renderWithRouter(<App />);
+describe('Login', () => {
+  setUpTest();
 
-    const titulo = screen.getByRole('heading', { level: 1 });
-    const email = screen.getByTestId(emailInput);
-    const senha = screen.getByTestId(senhaInput);
-    const botao = screen.getByRole('button');
+  it('renders the form with the submit button disabled', () => {
+    renderApp('/');
 
-    expect(titulo).toBeInTheDocument();
-    expect(email).toBeInTheDocument();
-    expect(senha).toBeInTheDocument();
-    expect(botao).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /welcome back/i })).toBeInTheDocument();
+    expect(screen.getByTestId('email-input')).toBeInTheDocument();
+    expect(screen.getByTestId('password-input')).toBeInTheDocument();
+    expect(screen.getByTestId('login-submit-btn')).toBeDisabled();
   });
 
-  it('Testa se o botão está desabilitado até o email e senha estarem corretos', () => {
-    renderWithRouter(<App />);
+  it('enables the submit button only for a valid email and a 6+ character password', async () => {
+    renderApp('/');
+    const submit = screen.getByTestId('login-submit-btn');
 
-    const email = screen.getByTestId(emailInput);
-    const senha = screen.getByTestId(senhaInput);
-    const botao = screen.getByRole('button');
+    await user.type(screen.getByTestId('email-input'), 'not-an-email');
+    await user.type(screen.getByTestId('password-input'), 'secret123');
+    expect(submit).toBeDisabled();
 
-    expect(botao).toBeDisabled();
-
-    userEvent.type(email, 'email@email.com');
-    userEvent.type(senha, '1234567');
-
-    expect(botao).not.toBeDisabled();
+    await user.clear(screen.getByTestId('email-input'));
+    await user.type(screen.getByTestId('email-input'), 'chef@example.com');
+    expect(submit).toBeEnabled();
   });
 
-  it('Testa se o botão envia o usuario para a rota /meals', () => {
-    const { history } = renderWithRouter(<App />);
+  it('signs the user in, stores the session and opens the meals page', async () => {
+    const { history } = renderApp('/');
 
-    const email = screen.getByTestId(emailInput);
-    const senha = screen.getByTestId(senhaInput);
-    const botao = screen.getByRole('button');
+    await user.type(screen.getByTestId('email-input'), 'chef@example.com');
+    await user.type(screen.getByTestId('password-input'), 'secret123');
+    await user.click(screen.getByTestId('login-submit-btn'));
 
-    userEvent.type(email, 'email@email.com');
-    userEvent.type(senha, '1234567');
-    userEvent.click(botao);
+    await waitFor(() => expect(history.location.pathname).toBe('/meals'));
+    expect(JSON.parse(localStorage.getItem('user'))).toEqual({ email: 'chef@example.com' });
+    expect(await screen.findByTestId('page-title')).toHaveTextContent('Meals');
+  });
 
-    const { pathname } = history.location;
-    expect(pathname).toBe('/meals');
+  it('redirects an already authenticated user straight to the meals page', async () => {
+    localStorage.setItem('user', JSON.stringify({ email: 'chef@example.com' }));
+    const { history } = renderApp('/');
+
+    expect(history.location.pathname).toBe('/meals');
+    expect(await screen.findByTestId('0-recipe-card')).toBeInTheDocument();
   });
 });

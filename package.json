@@ -1,30 +1,57 @@
 {
-  "name": "recipes-app-test",
-  "version": "1.0.0",
+  "name": "receita-recipes-app",
+  "version": "2.0.0",
   "private": true,
+  "description": "RecEITA! — a mobile-first recipe explorer built with React. Browse, search and filter meals and cocktails, follow step-by-step cooking progress, and keep your favourites and finished dishes in one place.",
+  "keywords": [
+    "react",
+    "recipe-app",
+    "recipes",
+    "cocktails",
+    "themealdb",
+    "thecocktaildb",
+    "frontend",
+    "context-api",
+    "react-hooks",
+    "react-router",
+    "responsive-design",
+    "pwa"
+  ],
+  "author": "Michael Robert <https://github.com/michaelrobertt>",
+  "contributors": [
+    "Antonio Marchiori <https://github.com/acmarchiori>",
+    "Igor Alegria <https://github.com/IgorAlegria>",
+    "Gleidson <https://github.com/GleidsonDev>",
+    "Elvine Santos"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelrobertt/RecipesApp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/michaelrobertt/RecipesApp/issues"
+  },
+  "homepage": "https://receita.surge.sh",
   "engines": {
-    "node": "16 || 18"
+    "node": ">=18"
   },
   "dependencies": {
-    "bootstrap": "^5.2.3",
-    "clipboard-copy": "^4.0.1",
     "prop-types": "^15.8.1",
-    "react": "^18.2.0",
-    "react-bootstrap": "^2.7.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-router-dom": "^5.3.4",
     "react-scripts": "^5.0.1"
   },
   "scripts": {
-    "cy": "env CY_CLI=true cypress run",
-    "cy:open": "cypress open --e2e --browser chrome",
-    "start": "env ESLINT_NO_DEV_ERRORS=true react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-scripts start",
+    "build": "react-scripts build && node scripts/postbuild.js",
     "test": "react-scripts test",
-    "test-coverage": "react-scripts test --coverage --watchAll=false",
-    "eject": "react-scripts eject",
-    "lint": "eslint --no-inline-config --no-error-on-unmatched-pattern -c .eslintrc.json . --ext .js,.jsx",
-    "lint:styles": "npx stylelint '**/*.css'"
+    "test:ci": "react-scripts test --watchAll=false",
+    "test:coverage": "react-scripts test --coverage --watchAll=false",
+    "lint": "eslint src --ext .js,.jsx",
+    "lint:styles": "stylelint \"src/**/*.css\"",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -42,28 +69,17 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@trybe/eslint-config-frontend": "^1.7.1",
-    "clipboardy": "^2.3.0",
-    "cypress": "^10.11.0",
-    "cypress-multi-reporters": "^1.6.2",
-    "fs-extra": "^10.1.0",
-    "mocha": "^10.2.0",
-    "mochawesome": "^7.1.3",
-    "mochawesome-merge": "^4.2.2",
-    "mochawesome-report-generator": "^6.2.0",
-    "stylelint": "^14.16.1",
-    "stylelint-order": "^5.0.0"
+    "@testing-library/dom": "^9.3.4",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^14.3.1",
+    "@testing-library/user-event": "^14.6.1",
+    "history": "^4.10.1",
+    "stylelint": "^16.11.0",
+    "stylelint-config-standard": "^36.0.1"
   },
   "jest": {
     "coveragePathIgnorePatterns": [
       "src/index.js",
-      "serviceWorker.js",
-      "src/fakes",
-      "src/routes",
-      "src/hooks",
       "src/tests"
     ]
   }

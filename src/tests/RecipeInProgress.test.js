@@ -1,45 +1,78 @@
-import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
-import renderWithRouter from './helpers/renderWithRouter';
-import App from '../App';
-import AppProvider from '../context/AppProvider';
+import {
+  renderApp, setUpTest, screen, signIn, userEvent, waitFor,
+} from './helpers/renderWithRouter';
 
-describe('Testa o componente InProgress', () => {
-  it('Testa se renderiza os elementos corretamente', async () => {
-    const { history } = renderWithRouter(
-      <AppProvider>
-        <App />
-      </AppProvider>,
+const user = userEvent.setup();
+
+const progressStorage = () => JSON.parse(localStorage.getItem('inProgressRecipes'));
+
+describe('Cooking a recipe', () => {
+  setUpTest();
+
+  it('lists every ingredient and keeps the finish button locked until all are ticked', async () => {
+    renderApp('/meals/52771/in-progress');
+
+    const boxes = await screen.findAllByRole('checkbox');
+    expect(boxes).toHaveLength(4);
+    expect(screen.getByTestId('finish-recipe-btn')).toBeDisabled();
+    expect(screen.getByText(/tick every ingredient/i)).toBeInTheDocument();
+
+    for (const box of boxes) {
+      await user.click(box);
+    }
+
+    expect(screen.getByTestId('finish-recipe-btn')).toBeEnabled();
+    expect(screen.getByTestId('finish-recipe-btn')).toHaveTextContent(/^finish recipe$/i);
+  });
+
+  it('persists ticked ingredients and restores them on the next visit', async () => {
+    renderApp('/meals/52771/in-progress');
+    await screen.findByRole('checkbox', { name: /garlic/i });
+
+    await user.click(screen.getByRole('checkbox', { name: /garlic/i }));
+
+    await waitFor(() => expect(progressStorage().meals['52771']).toEqual(['garlic']));
+  });
+
+  it('restores a saved checklist and allows un-ticking', async () => {
+    localStorage.setItem(
+      'inProgressRecipes',
+      JSON.stringify({ meals: { 52771: ['garlic', 'olive oil'] }, drinks: {} }),
     );
+    renderApp('/meals/52771/in-progress');
 
-    act(() => {
-      history.push('/meals/52977/in-progress');
-    });
+    const garlic = await screen.findByRole('checkbox', { name: /garlic/i });
+    expect(garlic).toBeChecked();
+    expect(screen.getByText('2/4')).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(screen.getByText(/corba/i)).toBeInTheDocument();
-    });
+    await user.click(garlic);
 
-    const tituloReceita = screen.getByRole('heading', { name: /corba/i });
-    expect(tituloReceita).toBeInTheDocument();
+    expect(garlic).not.toBeChecked();
+    expect(progressStorage().meals['52771']).toEqual(['olive oil']);
+  });
 
-    const compartilharBtn = screen.getByRole('img', { name: /botão compartilhar/i });
-    expect(compartilharBtn).toBeInTheDocument();
+  it('saves the finished recipe and clears the in-progress state', async () => {
+    signIn();
+    const { history } = renderApp('/meals/52771/in-progress');
 
-    const favoritarBtn = screen.getByRole('img', { name: /botão favoritar/i });
-    expect(favoritarBtn).toBeInTheDocument();
+    for (const box of await screen.findAllByRole('checkbox')) {
+      await user.click(box);
+    }
+    await user.click(screen.getByTestId('finish-recipe-btn'));
 
-    const categoriaReceita = screen.getByTestId('recipe-category');
-    expect(categoriaReceita).toBeInTheDocument();
+    await waitFor(() => expect(history.location.pathname).toBe('/done-recipes'));
 
-    const ingredients = screen.getByRole('heading', { name: /ingredients/i });
-    expect(ingredients).toBeInTheDocument();
-
-    const instructions = screen.getByRole('heading', { name: /instructions/i });
-    expect(instructions).toBeInTheDocument();
-
-    const finalizarReceitaBtn = screen.getByRole('button', { name: /finalizar receita/i });
-    expect(finalizarReceitaBtn).toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem('doneRecipes'))).toEqual([
+      expect.objectContaining({
+        id: '52771',
+        type: 'meal',
+        name: 'Spicy Arrabiata Penne',
+        category: 'Vegetarian',
+        nationality: 'Italian',
+        tags: ['Pasta', 'Spicy'],
+        doneDate: expect.any(String),
+      }),
+    ]);
+    expect(progressStorage().meals).toEqual({});
   });
 });

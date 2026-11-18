@@ -1,177 +1,95 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
-import AppContext from '../context/AppContext';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { SearchIcon } from './icons';
 
-function SearchBar() {
-  const { setRespostaDaPesquisa } = useContext(AppContext);
-  const [tipoDePesquisa, setTipoDePesquisa] = useState('ingrediente');
-  const [refeicaoPesquisada, setRefeicaoPesquisada] = useState('');
-  const [comidaDados, setComidaDados] = useState(null);
-  const location = useLocation();
-  const history = useHistory();
-  const alerta = 'Sorry, we haven\'t found any recipes for these filters.';
+export const SEARCH_MODES = [
+  { id: 'ingredient', label: 'Ingredient' },
+  { id: 'name', label: 'Name' },
+  { id: 'first-letter', label: 'First letter' },
+];
 
-  useEffect(() => {
-    if (comidaDados) {
-      if (location.pathname === '/meals') {
-        if (comidaDados.length === 1) {
-          history.push(`/meals/${comidaDados[0].idMeal}`);
-        }
-        setRespostaDaPesquisa(comidaDados);
-      }
-      if (location.pathname === '/drinks') {
-        if (comidaDados.length === 1) {
-          history.push(`/drinks/${comidaDados[0].idDrink}`);
-        }
-        setRespostaDaPesquisa(comidaDados);
-      }
+export const SEARCH_TEST_IDS = {
+  ingredient: 'ingredient-search-radio',
+  name: 'name-search-radio',
+  'first-letter': 'first-letter-search-radio',
+};
+
+function SearchBar({ onSubmit, placeholder = 'Search recipes…', autoFocus = true }) {
+  const [mode, setMode] = useState('ingredient');
+  const [query, setQuery] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const term = query.trim();
+
+    if (!term) {
+      setError('Type something to search.');
+      return;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [comidaDados]);
-
-  const pesquisarComidaIngrediente = async () => {
-    if (tipoDePesquisa === 'ingrediente' && refeicaoPesquisada !== '') {
-      const requisicao = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${refeicaoPesquisada}`);
-      const dados = await requisicao.json();
-      if (dados.meals === null) {
-        global.alert(alerta);
-      }
-      return setComidaDados(dados.meals);
+    if (mode === 'first-letter' && term.length !== 1) {
+      setError('A first-letter search needs exactly one character.');
+      return;
     }
-  };
 
-  const pesquisarComidaNome = async () => {
-    if (tipoDePesquisa === 'nome' && refeicaoPesquisada !== '') {
-      const requisicaoNome = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${refeicaoPesquisada}`);
-      const dadosNome = await requisicaoNome.json();
-      if (dadosNome.meals === null) {
-        global.alert(alerta);
-      }
-      return setComidaDados(dadosNome.meals);
-    }
-  };
-
-  const pesquisarComidaLetra = async () => {
-    if (tipoDePesquisa === 'primeiraLetra' && refeicaoPesquisada !== ''
-    && refeicaoPesquisada.length === 1) {
-      const requisicaoLetra = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?f=${refeicaoPesquisada}`);
-      const dadosLetra = await requisicaoLetra.json();
-      if (dadosLetra.meals === null) {
-        global.alert(alerta);
-      }
-      return setComidaDados(dadosLetra.meals);
-    }
-  };
-
-  const pesquisarBebidaIngrediente = async () => {
-    if (tipoDePesquisa === 'ingrediente' && refeicaoPesquisada !== '') {
-      try {
-        const requisicao = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${refeicaoPesquisada}`);
-        const dados = await requisicao.json();
-        return setComidaDados(dados.drinks);
-      } catch (erro) {
-        global.alert(alerta);
-      }
-    }
-  };
-
-  const pesquisarBebidaNome = async () => {
-    if (tipoDePesquisa === 'nome' && refeicaoPesquisada !== '') {
-      const requisicaoNome = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${refeicaoPesquisada}`);
-      const dadosNome = await requisicaoNome.json();
-      if (dadosNome.drinks === null) {
-        global.alert(alerta);
-      }
-      return setComidaDados(dadosNome.drinks);
-    }
-  };
-
-  const pesquisarBebidaLetra = async () => {
-    if (tipoDePesquisa === 'primeiraLetra' && refeicaoPesquisada !== ''
-    && refeicaoPesquisada.length === 1) {
-      const requisicaoLetra = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/search.php?f=${refeicaoPesquisada}`);
-      const dadosLetra = await requisicaoLetra.json();
-      if (dadosLetra.drinks === null) {
-        global.alert(alerta);
-      }
-      return setComidaDados(dadosLetra.drinks);
-    }
-  };
-
-  const pesquisar = () => {
-    if (tipoDePesquisa === 'primeiraLetra' && refeicaoPesquisada.length > 1) {
-      global.alert('Your search must have only 1 (one) character');
-    } if (location.pathname === '/meals') {
-      pesquisarComidaIngrediente();
-      pesquisarComidaNome();
-      pesquisarComidaLetra();
-    } if (location.pathname === '/drinks') {
-      pesquisarBebidaIngrediente();
-      pesquisarBebidaNome();
-      pesquisarBebidaLetra();
-    }
+    setError('');
+    onSubmit({ mode, query: term });
   };
 
   return (
-    <div className="search">
-      <div className="pesquisa-search">
+    <form className="search-bar" onSubmit={ handleSubmit } role="search">
+      <div className="search-bar__field">
+        <SearchIcon size={ 18 } className="search-bar__icon" />
         <input
-          type="text"
+          type="search"
           data-testid="search-input"
-          name="barraDePesquisa"
-          value={ refeicaoPesquisada }
-          onChange={ (e) => setRefeicaoPesquisada(e.target.value) }
-          placeholder="Search..."
+          name="query"
+          value={ query }
+          onChange={ (event) => setQuery(event.target.value) }
+          placeholder={ placeholder }
+          aria-label="Search recipes"
+          autoFocus={ autoFocus }
+          autoComplete="off"
         />
-        <button
-          type="button"
-          data-testid="exec-search-btn"
-          name="botaoDePesquisa"
-          onClick={ () => pesquisar() }
-        >
-          Pesquisar
+        <button type="submit" className="btn btn--primary btn--sm" data-testid="exec-search-btn">
+          Search
         </button>
       </div>
-      <div className="pesquisa-filters">
-        <label htmlFor="ingrediente">
-          <input
-            type="radio"
-            data-testid="ingredient-search-radio"
-            id="ingrediente"
-            name="ingrediente"
-            value="ingrediente"
-            checked={ tipoDePesquisa === 'ingrediente' }
-            onChange={ () => setTipoDePesquisa('ingrediente') }
-          />
-          Ingrediente
-        </label>
-        <label htmlFor="nome">
-          <input
-            type="radio"
-            data-testid="name-search-radio"
-            id="nome"
-            name="nome"
-            value="nome"
-            checked={ tipoDePesquisa === 'nome' }
-            onChange={ () => setTipoDePesquisa('nome') }
-          />
-          Nome
-        </label>
-        <label htmlFor="primeiraLetra">
-          <input
-            type="radio"
-            data-testid="first-letter-search-radio"
-            id="primeiraLetra"
-            name="primeiraLetra"
-            value="primeiraLetra"
-            checked={ tipoDePesquisa === 'primeiraLetra' }
-            onChange={ () => setTipoDePesquisa('primeiraLetra') }
-          />
-          Primeira Letra
-        </label>
-      </div>
-    </div>
+
+      <fieldset className="search-bar__modes">
+        <legend className="visually-hidden">Search by</legend>
+        {SEARCH_MODES.map((option) => (
+          <label
+            key={ option.id }
+            className={ `pill ${mode === option.id ? 'pill--active' : ''}` }
+            htmlFor={ `search-mode-${option.id}` }
+          >
+            <input
+              type="radio"
+              id={ `search-mode-${option.id}` }
+              name="search-mode"
+              value={ option.id }
+              data-testid={ SEARCH_TEST_IDS[option.id] }
+              checked={ mode === option.id }
+              onChange={ () => {
+                setMode(option.id);
+                setError('');
+              } }
+            />
+            {option.label}
+          </label>
+        ))}
+      </fieldset>
+
+      {error ? <p className="form-error" role="alert">{error}</p> : null}
+    </form>
   );
 }
+
+SearchBar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
+  autoFocus: PropTypes.bool,
+};
 
 export default SearchBar;

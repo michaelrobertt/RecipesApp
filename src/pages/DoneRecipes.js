@@ -1,155 +1,60 @@
-import React, { useState, useEffect } from 'react';
-/* import clipboardCopy from 'clipboard-copy'; */
+import React, { useContext, useMemo, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import Header from '../components/Header';
-import shareIcon from '../images/shareIcon.svg';
+import Footer from '../components/Footer';
+import SavedRecipeCard, { FilterTabs } from '../components/SavedRecipeCard';
+import { EmptyState } from '../components/Feedback';
+import { BadgeCheckIcon } from '../components/icons';
+import AppContext from '../context/AppContext';
 
 function DoneRecipes() {
-  const dateNow = new Date();
-  const [linkCopied, setLinkCopied] = useState(false);
-  const [filtro, setBtnFiltro] = useState([]);
-  const [receitaFeita, setReceitaFeita] = useState([
-    {
-      id: '178319',
-      nationality: '',
-      name: 'Aquamarine',
-      category: 'Cocktail',
-      image: 'https://www.thecocktaildb.com/images/media/drink/zvsre31572902738.jpg',
-      tags: [],
-      alcoholicOrNot: 'Alcoholic',
-      type: 'drink',
-      doneDate: dateNow.toISOString(),
-    },
-    {
-      id: '52771',
-      type: 'meal',
-      nationality: 'Italian',
-      category: 'Vegetarian',
-      alcoholicOrNot: '',
-      name: 'Spicy Arrabiata Penne',
-      image: 'https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg',
-      doneDate: '23/06/2020',
-      tags: ['Pasta', 'Curry'],
-    },
-  ]);
+  const { doneRecipes } = useContext(AppContext);
+  const history = useHistory();
+  const [filter, setFilter] = useState('all');
 
-  useEffect(() => {
-    if (Object.prototype.hasOwnProperty.call(localStorage, 'doneRecipes')) {
-      const done = JSON.parse(localStorage.getItem('doneRecipes'));
-      console.log(done);
-      setReceitaFeita(done);
-    }
-  }, []);
-
-  useEffect(() => {
-    setBtnFiltro(receitaFeita);
-  }, [receitaFeita]);
-
-  const botaoBtnFiltro = ({ target }) => {
-    if (target.name !== 'All') {
-      console.log('Entrei dentro do filtro!');
-      const mealFilter = receitaFeita.filter((el) => el.type === target.name);
-      setBtnFiltro(mealFilter);
-    } else {
-      setBtnFiltro(receitaFeita);
-    }
-  };
+  const visible = useMemo(() => [...doneRecipes]
+    .sort((a, b) => new Date(b.doneDate) - new Date(a.doneDate))
+    .filter((entry) => filter === 'all' || entry.type === filter), [doneRecipes, filter]);
 
   return (
-    <div>
-      <Header pesquisaOff titulo="Done Recipes" />
-      <header className="donerecipebtn">
-        <button
-          name="All"
-          onClick={ botaoBtnFiltro }
-          type="button"
-          data-testid="filter-by-all-btn"
-        >
-          All
-        </button>
-        <button
-          name="meal"
-          onClick={ botaoBtnFiltro }
-          type="button"
-          data-testid="filter-by-meal-btn"
-        >
-          Meals
-        </button>
-        <button
-          name="drink"
-          onClick={ botaoBtnFiltro }
-          type="button"
-          data-testid="filter-by-drink-btn"
-        >
-          Drinks
-        </button>
-      </header>
-      {
-        filtro.map((done, index) => {
-          const {
-            image,
-            /* id, */
-            name,
-            nationality,
-            category,
-            tags,
-            alcoholicOrNot,
-            type,
-            doneDate,
-          } = done;
+    <div className="page">
+      <Header title="Completed dishes" backTo="/meals" />
+      <main className="page__content">
+        <FilterTabs value={ filter } onChange={ setFilter } />
 
-          return (
-            <div className="doneRecipes" key={ done }>
-              <img
-                className="donerecipeimg"
-                src={ image }
-                alt={ name }
-                data-testid={ `${index}-horizontal-image` }
+        <p className="results-line" role="status">
+          {visible.length}
+          {visible.length === 1 ? ' dish cooked' : ' dishes cooked'}
+        </p>
+
+        {visible.length === 0 ? (
+          <EmptyState
+            icon={ <BadgeCheckIcon size={ 34 } /> }
+            title="No finished dishes yet"
+            message="Open a recipe, tick off every ingredient and press “Finish recipe” to see it here."
+          >
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={ () => history.push('/meals') }
+            >
+              Find something to cook
+            </button>
+          </EmptyState>
+        ) : (
+          <div className="saved-list">
+            {visible.map((entry, index) => (
+              <SavedRecipeCard
+                key={ entry.id }
+                entry={ entry }
+                index={ index }
+                showDoneDate
               />
-
-              <span data-testid={ `${index}-horizontal-top-text` }>
-
-                { type === 'meal' ? `${nationality} - ${category}` : alcoholicOrNot}
-              </span>
-              {
-                type === 'meal'
-                && tags.length > 0
-                && tags.map((tag) => (
-                  <span
-                    key={ tag }
-                    data-testid={ `${index}-${tag}-horizontal-tag` }
-                  >
-                    {tag}
-                  </span>
-                ))
-              }
-
-              <h3 data-testid={ `${index}-horizontal-name` }>{name}</h3>
-              <p data-testid={ `${index}-horizontal-done-date` }>{doneDate}</p>
-
-              <button
-                className="botaodone"
-                src={ shareIcon }
-                onClick={ () => {
-                  navigator.clipboard.writeText(`http://localhost:3000/${done.type}s/${done.id}`)
-                    .then(
-                      () => { setLinkCopied(true); },
-                      () => { setLinkCopied(false); },
-                    );
-                } }
-                type="button"
-                data-testid={ `${index}-horizontal-share-btn` }
-              >
-                Share
-              </button>
-              {
-                linkCopied && <p>Link copied!</p>
-
-              }
-            </div>
-
-          );
-        })
-      }
+            ))}
+          </div>
+        )}
+      </main>
+      <Footer />
     </div>
   );
 }
