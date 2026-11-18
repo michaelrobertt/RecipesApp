@@ -250,7 +250,7 @@ foundations — and fixes the bugs that made parts of it unusable:
   folder that was never committed. The suite was rewritten around an inline API
   mock; `npm test` works out of the box.
 - **Bootstrap CSS was imported but unused** (and every page carried inline
-  styles); replaced by tokens and ~4 kB of CSS.
+  styles); replaced by tokens and ~5 kB of CSS (gzip).
 - Stale CRA leftovers removed: `serviceWorker.js`, the React logos, the unused
   Cypress/Mochawesome toolchain, duplicate routes in `App.js`.
 - Added: 404 page, search that closes, toast feedback, shareable deep links,
